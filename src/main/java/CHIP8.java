@@ -12,8 +12,8 @@ import javafx.stage.Stage;
 
 public class CHIP8 extends Application {
 
-    private static final int SCREEN_WIDTH = 900;
-    private static final int SCREEN_HEIGHT = 500;
+    private static final int SCREEN_WIDTH = 800;
+    private static final int SCREEN_HEIGHT = 430;
 
     MenuBar menuBar;
     Screen screen;
@@ -50,10 +50,6 @@ public class CHIP8 extends Application {
         layout.getChildren().add(menuBar);
 
         screen = new Screen();
-        //only to show that screen work
-        GraphicsContext gc = screen.getGraphicsContext2D();
-        gc.setFill(Color.BLUE);
-        gc.fillRect(75,75,100,100);
 
         layout.getChildren().add(screen);
 
