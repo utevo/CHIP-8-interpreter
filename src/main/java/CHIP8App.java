@@ -10,7 +10,7 @@ import javafx.stage.Stage;
 
 
 
-public class CHIP8 extends Application {
+public class CHIP8App extends Application {
 
     private static final int SCREEN_WIDTH = 800;
     private static final int SCREEN_HEIGHT = 430;
