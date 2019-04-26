@@ -1,3 +1,5 @@
+package chip8;
+
 import lombok.Data;
 
 @Data

@@ -1,3 +1,5 @@
+package chip8;
+
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -16,15 +18,17 @@ public class Keyboard {
         }
     }
 
-    void setKeyUp(int i) {
-        keys[i] = true;
+    public void setKeyUp(int i) {
+        if (i >= 0 && i <= 15)
+            keys[i] = true;
     }
 
-    void setKeyDown(int i) {
-        keys[i] = false;
+    public void setKeyDown(int i) {
+        if (i >= 0 && i <= 15)
+            keys[i] = false;
     }
 
-    boolean isPressed(int i) {
+    public boolean isPressed(int i) {
         return keys[i];
     }
 }

@@ -56,7 +56,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>CHIP8App</mainClass>
+                    <mainClass>chip8.app.CHIP8App</mainClass>
                 </configuration>
             </plugin>
         </plugins>

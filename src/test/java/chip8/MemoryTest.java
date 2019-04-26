@@ -1,6 +1,5 @@
+import chip8.Memory;
 import org.junit.Test;
-
-import javax.swing.plaf.synth.SynthEditorPaneUI;
 
 import static org.junit.Assert.*;
 
