@@ -1,4 +1,5 @@
-import chip8.Memory;
+package chip8;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
