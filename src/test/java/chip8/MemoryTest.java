@@ -1,14 +1,21 @@
 package chip8;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class MemoryTest {
 
+    Memory memory;
+
+    @Before
+    public void initialize() {
+        memory = new Memory();
+    }
+
     @Test
-    public void Constructor() throws Exception {
-        Memory memory = new Memory();
+    public void constructor() {
 
         assertArrayEquals(memory.getRAM(), new byte[4096]);
         assertArrayEquals(memory.getV(), new byte[16]);
@@ -23,8 +30,7 @@ public class MemoryTest {
     }
 
     @Test
-    public void setRAM() throws Exception {
-        Memory memory = new Memory();
+    public void setRAM() {
 
         byte tempRAM[] = memory.getRAM();
         tempRAM[0] = 0x01;
@@ -36,8 +42,7 @@ public class MemoryTest {
     }
 
     @Test
-    public void setV() throws Exception {
-        Memory memory = new Memory();
+    public void setV() {
 
         byte tempV[] = memory.getV();
         tempV[0] = 0x45;
@@ -49,8 +54,7 @@ public class MemoryTest {
     }
 
     @Test
-    public void setStack() throws Exception {
-        Memory memory = new Memory();
+    public void setStack() {
 
         char tempStack[] = memory.getStack();
         tempStack[0] = 0x89;

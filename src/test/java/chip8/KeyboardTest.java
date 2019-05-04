@@ -1,14 +1,20 @@
 package chip8;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
 
 public class KeyboardTest {
 
+    Keyboard keyboard;
+
+    @Before public void initialize() {
+        keyboard = new Keyboard();
+    }
+
     @Test
     public void consturctor() {
-        Keyboard keyboard = new Keyboard();
 
         for (int i = 0; i < 16; ++i) {
             assertEquals(keyboard.isPressed(i), false);
@@ -17,7 +23,6 @@ public class KeyboardTest {
 
     @Test
     public void setKeyUp() {
-        Keyboard keyboard = new Keyboard();
 
         assertEquals(keyboard.isPressed(0), false);
         assertEquals(keyboard.isPressed(3), false);
@@ -52,7 +57,6 @@ public class KeyboardTest {
 
     @Test
     public void setKeyDown() {
-        Keyboard keyboard = new Keyboard();
 
         keyboard.setKeyUp(1);
         assertEquals(keyboard.isPressed(1), true);
