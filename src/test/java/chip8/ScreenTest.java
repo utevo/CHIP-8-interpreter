@@ -18,7 +18,7 @@ public class ScreenTest {
     public void constructor() {
         for (int i = 0; i < Screen.HEIGHT; ++i)
             for (int j = 0; j < Screen.WIDTH; ++j)
-                assertEquals(screen.getPixel(i, j),false);
+                assertEquals(screen.getPixel(j, i),false);
 
     }
 
