@@ -16,12 +16,9 @@ import javafx.stage.Stage;
 public class CHIP8App extends Application {
 
     private static final int SCREEN_WIDTH = 800;
-    private static final int SCREEN_HEIGHT = 430;
+    private static final int SCREEN_HEIGHT = 400;
 
     private MenuBar menuBar;
-
-    private Screen screen = new Screen();
-    private Keyboard keyboard = new Keyboard();
 
     private MenuBar createMenuBar() {
 
@@ -95,21 +92,16 @@ public class CHIP8App extends Application {
         menuBar = createMenuBar();
         layout.getChildren().add(menuBar);
 
-        screen = new Screen();
+        Screen screen = new Screen();
+        ScreenApp screenApp = new ScreenApp(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-        //layout.getChildren().add(screen);
+        layout.getChildren().add(screenApp);
+        screenApp.render();
 
-        Scene scene = new Scene(layout, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-        scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-            @Override
-            public void handle(KeyEvent e) {
-                keyboard.setKeyDown(convert(e));
-            }
-        });
-
+        Scene scene = new Scene(layout);
 
         primaryStage.setScene(scene);
+        primaryStage.setResizable(false);
         primaryStage.show();
     }
 
