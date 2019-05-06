@@ -2,10 +2,10 @@ package chip8;
 
 public class Screen {
 
-    final static int HEIGHT = 32;
-    final static int WIDTH = 64;
+    public final static int HEIGHT = 32;
+    public final static int WIDTH = 64;
 
-    private boolean pixels[][] = new boolean[HEIGHT][WIDTH];
+    private boolean pixels[][] = new boolean[WIDTH][HEIGHT];
 
 
     public void setPixel(int x, int y) {
