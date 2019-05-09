@@ -19,9 +19,17 @@ public class Screen {
             pixels[y][x] = true;
     }
 
+    public void clear() {
+        for (int i = 0; i < Screen.HEIGHT; ++i)
+            for (int j = 0; j < Screen.WIDTH; ++j)
+                pixels[i][j] = false;
+    }
+
     public boolean getPixel(int x, int y) {
         return pixels[y][x];
     }
+
+
 
 
 
