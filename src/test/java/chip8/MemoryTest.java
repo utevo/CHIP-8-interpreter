@@ -16,53 +16,32 @@ public class MemoryTest {
 
     @Test
     public void constructor() {
+        assertArrayEquals(memory.RAM, new byte[4096]);
+        assertArrayEquals(memory.V, new byte[16]);
+        assertEquals(memory.I, 0);
+        assertEquals(memory.PC, 0);
 
-        assertArrayEquals(memory.getRAM(), new byte[4096]);
-        assertArrayEquals(memory.getV(), new byte[16]);
-        assertEquals(memory.getI(), 0);
-        assertEquals(memory.getPC(), 0);
+        assertArrayEquals(memory.stack, new char[16]);
+        assertEquals(memory.SP, 0);
 
-        assertArrayEquals(memory.getStack(), new char[16]);
-        assertEquals(memory.getSP(), 0);
-
-        assertEquals(memory.getDelayTimer(), 0);
-        assertEquals(memory.getSoundTimer(), 0);
+        assertEquals(memory.delayTimer, 0);
+        assertEquals(memory.soundTimer, 0);
     }
 
     @Test
-    public void setRAM() {
+    public void clear() {
+        memory.RAM[1] = 32;
+        memory.RAM[12] = 123;
 
-        byte tempRAM[] = memory.getRAM();
-        tempRAM[0] = 0x01;
-        tempRAM[1] = 0x23;
+        memory.PC = 71;
 
-        memory.setRAM(tempRAM);
+        memory.SP = 3;
 
-        assertEquals(memory.getRAM(), tempRAM);
-    }
+        memory.clear();
 
-    @Test
-    public void setV() {
-
-        byte tempV[] = memory.getV();
-        tempV[0] = 0x45;
-        tempV[1] = 0x67;
-
-        memory.setV(tempV);
-
-        assertEquals(memory.getV(), tempV);
-    }
-
-    @Test
-    public void setStack() {
-
-        char tempStack[] = memory.getStack();
-        tempStack[0] = 0x89;
-        tempStack[1] = 0xAB;
-
-        memory.setStack(tempStack);
-
-        assertEquals(memory.getStack(), tempStack);
+        assertArrayEquals(memory.RAM, new byte[4096]);
+        assertEquals(memory.PC, 0);
+        assertEquals(memory.SP, 0);
     }
 
 
