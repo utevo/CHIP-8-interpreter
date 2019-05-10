@@ -1,17 +1,28 @@
 package chip8;
 
-import lombok.Data;
-
-@Data
 public class Memory {
-    private byte[] RAM = new byte[4096];
-    private byte[] V = new byte[16];
-    private char I;
-    private char PC;
+    public byte[] RAM = new byte[4096];
+    public byte[] V = new byte[16];
+    public char I;
+    public char PC;
 
-    private char[] stack = new char[16];
-    private int SP;
+    public char[] stack = new char[16];
+    public int SP;
 
-    private byte delayTimer;
-    private byte soundTimer;
+    public byte delayTimer;
+    public byte soundTimer;
+
+    public void clear() {
+        for (int i = 0; i < RAM.length; ++i)
+            RAM[i] = 0;
+        for (int i = 0; i < V.length; ++i)
+            V[i] = 0;
+        I = 0;
+        PC = 0;
+        for (int i = 0; i < stack.length; ++i)
+            stack[i] = 0;
+        SP = 0;
+        delayTimer = 0;
+        soundTimer = 0;
+    }
 }

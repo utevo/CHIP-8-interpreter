@@ -40,6 +40,19 @@ public class ScreenTest {
     }
 
     @Test
+    public void clear() {
+        screen.setPixel(12, 25);
+        screen.setPixel(3,12);
+        screen.setPixel(27,1);
+
+        screen.clear();
+
+        for (int i = 0; i < Screen.HEIGHT; ++i)
+            for (int j = 0; j < Screen.WIDTH; ++j)
+                assertEquals(screen.getPixel(j, i),false);
+    }
+
+    @Test
     public void flipPixel() {
         int x = 12;
         int y = 25;
