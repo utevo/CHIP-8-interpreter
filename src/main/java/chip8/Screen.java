@@ -1,5 +1,8 @@
 package chip8;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Screen {
 
     public final static int HEIGHT = 32;

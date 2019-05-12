@@ -1,5 +1,8 @@
 package chip8;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Memory {
     public byte[] RAM = new byte[4096];
     public byte[] V = new byte[16];
@@ -7,7 +10,7 @@ public class Memory {
     public char PC;
 
     public char[] stack = new char[16];
-    public int SP;
+    public byte SP;
 
     public byte delayTimer;
     public byte soundTimer;
