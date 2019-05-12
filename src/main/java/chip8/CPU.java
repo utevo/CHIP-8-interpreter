@@ -1,16 +1,23 @@
 package chip8;
 
-import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
-@Data
 public class CPU {
 
+    @Getter @Setter
     private Memory memory;
+    @Getter @Setter
     private Keyboard keyboard;
+    @Getter @Setter
     private Screen screen;
 
+
     boolean changeOnScreen = false;
+
+    public boolean wasChangeOnScreen() {
+        return changeOnScreen;
+    }
 
     public CPU(Memory memory, Keyboard keyboard, Screen screen) {
         this.memory = memory;
@@ -18,8 +25,13 @@ public class CPU {
         this.screen = screen;
     }
 
-    private char fetchOpcode() {
-        return (char)((memory.RAM[memory.PC] << 8) | (memory.RAM[memory.PC + 1]));
+
+    public char fetchOpcode() {
+        int a = memory.RAM[memory.PC] & 0xFF;
+        int b = memory.RAM[memory.PC + 1] & 0xFF;
+        char result = (char)((a << 8) | b);
+
+        return result;
     }
 
     public void nextTick() throws IllegalStateException {
@@ -193,45 +205,83 @@ public class CPU {
 
     }
 
-    //  Explanation: Clears the screen.
+    /***
+     * Clears the screen.
+     */
     public void opcode00E0() {
         screen.clear();
         changeOnScreen = true;
+
         memory.PC += 2;
     }
 
-    //  Explanation: Returns from a subroutine.
+    /***
+     *  Returns from a subroutine.
+     */
     public void opcode00EE() {
-        memory.PC = memory.stack[memory.SP--];
+        memory.PC = memory.stack[memory.SP];
+        --memory.SP;
     }
-
-    //  Explanation: Jumps to address NNN.
+    /***
+     *  Jumps to address NNN.
+     */
     public void opcode1NNN() {
-        char address = (char) (fetchOpcode() & 0x0FFF);
-        memory.PC = address;
+        char newAddress = (char) (fetchOpcode() & 0x0FFF);
+        memory.PC = newAddress;
     }
 
-    //  Explanation: Calls subroutine at NNN.
+    /***
+     *  Calls subroutine at NNN.
+     */
     public void opcode2NNN() {
+        ++memory.SP;
+        memory.stack[memory.SP] = memory.PC;
 
+        char newAddress = (char)(fetchOpcode() & 0x0FFF);
+        memory.PC = newAddress;
     }
 
-    //  Explanation: Skips the next instruction if VX equals NN.
-    //  (Usually the next instruction is a jump to skip a code block)
+
+    /***
+     *  Skips the next instruction if VX equals NN.
+     *  (Usually the next instruction is a jump to skip a code block)
+     */
     public void opcode3XNN() {
+        byte NN = (byte)(fetchOpcode() & 0xFF);
+        int X = (fetchOpcode() & 0x0F00) >> 8;
 
+        if (memory.V[X] == NN)
+            memory.PC += 4;
+        else
+            memory.PC += 2;
     }
 
-    //  Explanation: Skips the next instruction if VX doesn't equal NN.
-    //  (Usually the next instruction is a jump to skip a code block)
+    /***
+     *  Skips the next instruction if VX doesn't equal NN.
+     *  (Usually the next instruction is a jump to skip a code block)
+     */
     public void opcode4XNN() {
+        byte NN = (byte) (fetchOpcode() & 0xFF);
+        int X = (fetchOpcode() & 0x0F00) >> 8;
 
+        if (memory.V[X] != NN)
+            memory.PC += 4;
+        else
+            memory.PC += 2;
     }
 
-    //  Explanation: Skips the next instruction if VX equals VY.
-    //  (Usually the next instruction is a jump to skip a code block)
+    /***
+     *  Skips the next instruction if VX equals VY.
+     *  (Usually the next instruction is a jump to skip a code block)
+     */
     public void opcode5XY0() {
+        int X = (fetchOpcode() & 0x0F00) >> 8;
+        int Y = (fetchOpcode() & 0x00F0) >> 4;
 
+        if (memory.V[X] == memory.V[Y])
+            memory.PC += 4;
+        else
+            memory.PC += 2;
     }
 
     //  Explanation: Sets VX to NN.
