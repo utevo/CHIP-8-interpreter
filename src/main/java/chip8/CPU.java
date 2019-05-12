@@ -247,7 +247,7 @@ public class CPU {
      *  (Usually the next instruction is a jump to skip a code block)
      */
     public void opcode3XNN() {
-        byte NN = (byte)(fetchOpcode() & 0xFF);
+        int NN = (byte)(fetchOpcode() & 0xFF);
         int X = (fetchOpcode() & 0x0F00) >> 8;
 
         if (memory.V[X] == NN)
@@ -261,7 +261,7 @@ public class CPU {
      *  (Usually the next instruction is a jump to skip a code block)
      */
     public void opcode4XNN() {
-        byte NN = (byte) (fetchOpcode() & 0xFF);
+        int NN = (byte) (fetchOpcode() & 0xFF);
         int X = (fetchOpcode() & 0x0F00) >> 8;
 
         if (memory.V[X] != NN)
@@ -294,30 +294,56 @@ public class CPU {
 
     }
 
-    //  Explanation: Sets VX to the value of VY.
+    /***
+     *   Sets VX to the value of VY.
+     */
     public void opcode8XY0() {
+        int X = (fetchOpcode() & 0x0F00) >> 8;
+        int Y = (fetchOpcode() & 0x00F0) >> 4;
 
+        memory.V[X] = memory.V[Y];
+        memory.PC += 2;
     }
 
-    //  Explanation: Sets VX to VX or VY.
-    //  (Bitwise OR operation)
+    /***
+     *   Sets VX to VX or VY.
+     *   (Bitwise OR operation)
+     */
     public void opcode8XY1() {
+        int X = (fetchOpcode() & 0x0F00) >> 8;
+        int Y = (fetchOpcode() & 0x00F0) >> 4;
 
+        memory.V[X] |= memory.V[Y];
+        memory.PC += 2;
     }
 
-    //  Explanation: Sets VX to VX and VY.
-    //  (Bitwise AND operation)
+    /***
+     *   Sets VX to VX and VY.
+     *   (Bitwise AND operation)
+     */
     public void opcode8XY2() {
+        int X = (fetchOpcode() & 0x0F00) >> 8;
+        int Y = (fetchOpcode() & 0x00F0) >> 4;
 
+        memory.V[X] &= memory.V[Y];
+        memory.PC += 2;
     }
 
-    //  Explanation: Sets VX to VX xor VY.
+    /***
+     *   Sets VX to VX xor VY.
+     */
     public void opcode8XY3() {
+        int X = (fetchOpcode() & 0x0F00) >> 8;
+        int Y = (fetchOpcode() & 0x00F0) >> 4;
 
+        memory.V[X] ^= memory.V[Y];
+        memory.PC += 2;
     }
 
-    //  Explanation: Adds VY to VX.
-    //  VF is set to 1 when there's a carry, and to 0 when there isn't.
+    /***
+     *   Adds VY to VX.
+     *   VF is set to 1 when there's a carry, and to 0 when there isn't.
+     */
     public void opcode8XY4() {
 
     }
