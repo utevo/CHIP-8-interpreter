@@ -248,7 +248,7 @@ public class CPU {
      */
     public void opcode3XNN() {
         int NN = (byte)(fetchOpcode() & 0xFF);
-        int X = (fetchOpcode() & 0x0F00) >> 8;
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
 
         if (memory.V[X] == NN)
             memory.PC += 4;
@@ -262,7 +262,7 @@ public class CPU {
      */
     public void opcode4XNN() {
         int NN = (byte) (fetchOpcode() & 0xFF);
-        int X = (fetchOpcode() & 0x0F00) >> 8;
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
 
         if (memory.V[X] != NN)
             memory.PC += 4;
@@ -275,8 +275,8 @@ public class CPU {
      *  (Usually the next instruction is a jump to skip a code block)
      */
     public void opcode5XY0() {
-        int X = (fetchOpcode() & 0x0F00) >> 8;
-        int Y = (fetchOpcode() & 0x00F0) >> 4;
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
         if (memory.V[X] == memory.V[Y])
             memory.PC += 4;
@@ -284,22 +284,34 @@ public class CPU {
             memory.PC += 2;
     }
 
-    //  Explanation: Sets VX to NN.
+    /***
+     *  Sets VX to NN.
+     */
     public void opcode6XNN() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int NN = (fetchOpcode() & 0x00FF);
 
+        memory.V[X] = (byte)NN;
+        memory.PC += 2;
     }
 
-    //  Explanation: Adds NN to VX. (Carry flag is not changed)
+    /***
+     *  Adds NN to VX. (Carry flag is not changed)
+     */
     public void opcode7XNN() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int NN = (fetchOpcode() & 0x00FF);
 
+        memory.V[X] += (byte)NN;
+        memory.PC += 2;
     }
 
     /***
      *   Sets VX to the value of VY.
      */
     public void opcode8XY0() {
-        int X = (fetchOpcode() & 0x0F00) >> 8;
-        int Y = (fetchOpcode() & 0x00F0) >> 4;
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
         memory.V[X] = memory.V[Y];
         memory.PC += 2;
@@ -310,8 +322,8 @@ public class CPU {
      *   (Bitwise OR operation)
      */
     public void opcode8XY1() {
-        int X = (fetchOpcode() & 0x0F00) >> 8;
-        int Y = (fetchOpcode() & 0x00F0) >> 4;
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
         memory.V[X] |= memory.V[Y];
         memory.PC += 2;
@@ -322,8 +334,8 @@ public class CPU {
      *   (Bitwise AND operation)
      */
     public void opcode8XY2() {
-        int X = (fetchOpcode() & 0x0F00) >> 8;
-        int Y = (fetchOpcode() & 0x00F0) >> 4;
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
         memory.V[X] &= memory.V[Y];
         memory.PC += 2;
@@ -333,8 +345,8 @@ public class CPU {
      *   Sets VX to VX xor VY.
      */
     public void opcode8XY3() {
-        int X = (fetchOpcode() & 0x0F00) >> 8;
-        int Y = (fetchOpcode() & 0x00F0) >> 4;
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
         memory.V[X] ^= memory.V[Y];
         memory.PC += 2;
@@ -345,13 +357,34 @@ public class CPU {
      *   VF is set to 1 when there's a carry, and to 0 when there isn't.
      */
     public void opcode8XY4() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
+        int result = (int) (memory.V[X] & 0xFF) + (memory.V[Y] & 0xFF);
 
+        if (result >= 0xFF) //  overflow
+            memory.V[0xF] = 0x1;
+        else
+            memory.V[0xF] = 0x0;
+
+        memory.V[X] += memory.V[Y];
+        memory.PC += 2;
     }
 
-    //  Explanation: VY is subtracted from VX.
-    //  VF is set to 0 when there's a borrow, and 1 when there isn't.
+    /***
+     *   VY is subtracted from VX.
+     *   VF is set to 0 when there's a borrow, and 1 when there isn't.
+     */
     public void opcode8XY5() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
+        if ((memory.V[X] & 0xFF) > (memory.V[Y] & 0xFF)) // not borrow
+            memory.V[0xF] = 0x1;
+        else
+            memory.V[0xF] = 0x0;
+
+        memory.V[X] -= memory.V[Y];
+        memory.PC += 2;
     }
 
     //  Explanation: Stores the least significant bit
