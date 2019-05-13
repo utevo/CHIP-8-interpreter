@@ -323,10 +323,82 @@ public class CPUTest {
 
     @Test
     public void opcode6XNN() {
+        basicInitialization();
+
+        final byte X = 0xB;
+        final byte NN = 0x2A;
+        final byte VX = 0x12;
+        final char PC = 0x0321;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x60 | X);
+        memory.RAM[memory.PC + 1] = (byte)(NN & 0x00FF);
+        memory.V[X] = VX; // V[X] != NN
+
+        cpu.opcode6XNN();
+        assertEquals(NN, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcode6XNNver2() {
+        basicInitialization();
+
+        final byte X = 0x9;
+        final byte NN = 0x2A;
+        final byte VX = 0x12;
+        final char PC = 0x0321;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x60 | X);
+        memory.RAM[memory.PC + 1] = (byte)(NN & 0x00FF);
+        memory.V[X] = VX; // V[X] != NN
+
+        cpu.nextTick();
+        assertEquals(NN, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcode7XNN() {
+        basicInitialization();
+
+        final byte X = 0xB;
+        final byte NN = 0x2A;
+        final byte VX = 0x12;
+        final char PC = 0x0321;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x70 | X);
+        memory.RAM[memory.PC + 1] = (byte)(NN & 0x00FF);
+        memory.V[X] = VX;
+
+        char corectResult = (char) VX + NN;
+
+        cpu.opcode7XNN();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcode7XNNver2() {
+        basicInitialization();
+
+        final byte X = 0x7;
+        final byte NN = 0x1A;
+        final byte VX = 0x13;
+        final char PC = 0x0311;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x70 | X);
+        memory.RAM[memory.PC + 1] = (byte)(NN & 0x00FF);
+        memory.V[X] = VX;
+
+        char corectResult = (char) VX + NN;
+
+        cpu.nextTick();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
@@ -375,7 +447,7 @@ public class CPUTest {
     public void opcode8XY1() {
         basicInitialization();
 
-        byte X = 0xF;
+        byte X = 0xE;
         byte Y = 0xC;
         char PC = 0x0234;
 
@@ -396,7 +468,7 @@ public class CPUTest {
     public void opcode8XY1ver2() {
         basicInitialization();
 
-        byte X = 0xF;
+        byte X = 0xE;
         byte Y = 0xC;
         char PC = 0x0234;
 
@@ -417,7 +489,7 @@ public class CPUTest {
     public void opcode8XY2() {
         basicInitialization();
 
-        byte X = 0xF;
+        byte X = 0xE;
         byte Y = 0xC;
         char PC = 0x0234;
 
@@ -438,7 +510,7 @@ public class CPUTest {
     public void opcode8XY2ver2() {
         basicInitialization();
 
-        byte X = 0xF;
+        byte X = 0xE;
         byte Y = 0xC;
         char PC = 0x0234;
 
@@ -459,7 +531,7 @@ public class CPUTest {
     public void opcode8XY3() {
         basicInitialization();
 
-        byte X = 0xF;
+        byte X = 0xE;
         byte Y = 0xC;
         char PC = 0x0234;
 
@@ -480,7 +552,7 @@ public class CPUTest {
     public void opcode8XY3ver2() {
         basicInitialization();
 
-        byte X = 0xF;
+        byte X = 0xE;
         byte Y = 0xC;
         char PC = 0x0234;
 
@@ -499,10 +571,138 @@ public class CPUTest {
 
     @Test
     public void opcode8XY4() {
+        basicInitialization();
+
+        byte X = 0xE;
+        byte Y = 0xC;
+        char PC = 0x0234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x80 | X);
+        memory.RAM[memory.PC + 1] = (byte)((Y << 4) | 0x04);
+
+        memory.V[X] =       (byte)0b11101101;
+        memory.V[Y] =             0b01000110;
+        byte corectResult = (byte)0b00110011; //with overflow
+
+        cpu.opcode8XY4();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x1, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
+
+
+        memory.PC = PC;
+
+        memory.V[X] =       (byte)0b00101101;
+        memory.V[Y] =             0b01001110;
+        corectResult =      (byte)0b01111011; //with overflow
+
+        cpu.opcode8XY4();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x0, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcode8XY4ver2() {
+        basicInitialization();
+
+        byte X = 0xE;
+        byte Y = 0xC;
+        char PC = 0x0234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x80 | X);
+        memory.RAM[memory.PC + 1] = (byte)((Y << 4) | 0x04);
+
+        memory.V[X] =       (byte)0b11101101;
+        memory.V[Y] =             0b01000110;
+        byte corectResult = (byte)0b00110011; // without overflow
+
+        cpu.nextTick();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x1, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
+
+
+        memory.PC = PC;
+
+        memory.V[X] =       (byte)0b00101101;
+        memory.V[Y] =             0b01001110;
+        corectResult =      (byte)0b01111011; // without overflow
+
+        cpu.nextTick();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x0, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcode8XY5() {
+        basicInitialization();
+
+        byte X = 0xE;
+        byte Y = 0xC;
+        char PC = 0x0234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x80 | X);
+        memory.RAM[memory.PC + 1] = (byte)((Y << 4) | 0x05);
+
+        memory.V[X] =       (byte)0b11101101;
+        memory.V[Y] =       (byte)0b01000110;
+        byte corectResult = (byte)0b10100111; // with not borrow
+
+        cpu.opcode8XY5();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x1, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
+
+
+        memory.PC = PC;
+
+        memory.V[X] =       (byte)0b00101101;
+        memory.V[Y] =             0b01001110;
+        corectResult =      (byte)0b11011111; // without not borrow
+
+        cpu.opcode8XY5();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x0, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcode8XY5ver2() {
+        basicInitialization();
+
+        byte X = 0xE;
+        byte Y = 0xC;
+        char PC = 0x0234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x80 | X);
+        memory.RAM[memory.PC + 1] = (byte)((Y << 4) | 0x05);
+
+        memory.V[X] =       (byte)0b11101101;
+        memory.V[Y] =       (byte)0b01000110;
+        byte corectResult = (byte)0b10100111; // with not borrow
+
+        cpu.nextTick();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x1, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
+
+
+        memory.PC = PC;
+
+        memory.V[X] =       (byte)0b00101101;
+        memory.V[Y] =             0b01001110;
+        corectResult =      (byte)0b11011111; // without not borrow
+
+        cpu.nextTick();
+        assertEquals(corectResult, memory.V[X]);
+        assertEquals(0x0, memory.V[0xF]);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
