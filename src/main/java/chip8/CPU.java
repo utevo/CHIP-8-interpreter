@@ -241,7 +241,6 @@ public class CPU {
         memory.PC = newAddress;
     }
 
-
     /***
      *  Skips the next instruction if VX equals NN.
      *  (Usually the next instruction is a jump to skip a code block)
@@ -383,25 +382,52 @@ public class CPU {
         else
             memory.V[0xF] = 0x0;
 
-        memory.V[X] -= memory.V[Y];
+        memory.V[X] = (byte)((memory.V[X] - memory.V[Y]) & 0xFF);
         memory.PC += 2;
     }
 
-    //  Explanation: Stores the least significant bit
-    //  of VX in VFand then shifts VX to the right by 1.
+    /***
+     *   Stores the least significant bit
+     *   of VX in VF and then shifts VX to the right by 1.
+     */
     public void opcode8XY6() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
 
+        memory.V[0xF] = (byte)(memory.V[X] & 0x01);
+
+        memory.V[X] = (byte)((memory.V[X] & 0xFF) >>> 1);
+        memory.PC += 2;
     }
 
-    //  Explanation: Sets VX to VY minus VX. VF is set to 0
-    //  when there's a borrow, and 1 when there isn't.
+    /***
+     *   Sets VX to VY minus VX. VF is set to 0
+     *   when there's a borrow, and 1 when there isn't..
+     */
     public void opcode8XY7() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
+
+        if ((memory.V[Y] & 0xFF) > (memory.V[X] & 0xFF)) // not borrow
+            memory.V[0xF] = 0x1;
+        else
+            memory.V[0xF] = 0x0;
+
+        memory.V[X] = (byte)((memory.V[Y] - memory.V[X]) & 0xFF);
+        memory.PC += 2;
 
     }
 
-    //  Explanation: Stores the most significant bit of VX
-    //  in VF and then shifts VX to the left by 1.
+    /***
+     *   Stores the most significant bit of VX
+     *   in VF and then shifts VX to the left by 1
+     */
     public void opcode8XYE() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+
+        memory.V[0xF] = (byte)((memory.V[X] & 0b10000000) >>> 7);
+
+        memory.V[X] = (byte)((memory.V[X] & 0xFF) << 1);
+        memory.PC += 2;
 
     }
 
