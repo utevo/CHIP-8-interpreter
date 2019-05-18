@@ -4,13 +4,11 @@ import chip8.CPU;
 import chip8.Keyboard;
 import chip8.Memory;
 import chip8.Screen;
+import chip8.app.debug.RegistersInfoApp;
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -21,6 +19,8 @@ public class CHIP8App extends Application {
     Keyboard keyboard;
     Memory memory;
     Screen screen;
+
+    RegistersInfoApp registersInfoApp;
 
     ScreenApp screenApp;
 
@@ -46,6 +46,14 @@ public class CHIP8App extends Application {
         menuSaveLoad.getItems().add(itemSave);
         menuSaveLoad.getItems().add(itemLoad);
         menuBar.getMenus().add(menuSaveLoad);
+
+        Menu menuDebug = new Menu("Debug");
+        MenuItem itemRegistersInfo = new MenuItem("Registers Info");
+
+        itemRegistersInfo.setOnAction(e -> registersInfoApp.show());
+        menuDebug.getItems().add(itemRegistersInfo);
+        menuBar.getMenus().add(menuDebug);
+
 
         return menuBar;
     }
@@ -102,8 +110,6 @@ public class CHIP8App extends Application {
 
         CPU cpu = new CPU(memory, keyboard, screen);
 
-
-
         VBox layout = new VBox();
 
         menuBar = createMenuBar();
@@ -112,18 +118,7 @@ public class CHIP8App extends Application {
         screenApp = new ScreenApp(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
         layout.getChildren().add(screenApp);
 
-
-        // screenApp.render();
-        Button button = new Button();
-        button.setText("Open a New Window");
-
-        DebugInfoApp debugInfoApp = new DebugInfoApp(cpu);
-
-        button.setOnAction(e -> debugInfoApp.show() );
-
-        layout.getChildren().add(button);
-
-
+        registersInfoApp = new RegistersInfoApp(cpu);
 
         Scene scene = new Scene(layout);
 

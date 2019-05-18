@@ -11,17 +11,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class DebugInfoApp extends Stage {
+public class RegistersInfoApp extends Stage {
 
-    CPU cpu;
+    private CPU cpu;
 
-    TableView<Register> table;
+    private TableView<Register> table;
+    private StackPane layout;
+    private Scene scene;
 
-
-    StackPane layout;
-    Scene scene;
-
-    public DebugInfoApp(CPU cpu) {
+    public RegistersInfoApp(CPU cpu) {
         this.cpu = cpu;
 
         TableColumn<Register, String> nameColumn = new TableColumn<>("Name");
@@ -29,7 +27,7 @@ public class DebugInfoApp extends Stage {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         TableColumn<Register, String> valueColumn = new TableColumn<>("Value");
-        valueColumn.setMinWidth(200);
+        valueColumn.setMinWidth(100);
         valueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
 
 
@@ -44,8 +42,6 @@ public class DebugInfoApp extends Stage {
         scene = new Scene(layout);
         this.setTitle("Debug Informations");
         this.setScene(scene);
-
-
     }
 
     public void refresh(){
@@ -60,15 +56,6 @@ public class DebugInfoApp extends Stage {
         newRegister = new Register("PC", valueOfRegisterAsHexString);
         registers.add(newRegister);
 
-        // V
-        for (int i = 0; i <= 0xF; ++i) {
-            String iAsHexString = Integer.toHexString(i).toUpperCase();
-            valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.V[i]).toUpperCase();
-
-            newRegister = new Register("V" + iAsHexString, valueOfRegisterAsHexString);
-            registers.add(newRegister);
-        }
-
         // I
         valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.I).toUpperCase();
         newRegister = new Register("I", valueOfRegisterAsHexString);
@@ -79,7 +66,15 @@ public class DebugInfoApp extends Stage {
         newRegister = new Register("SP", valueOfRegisterAsHexString);
         registers.add(newRegister);
 
-        table.setItems(registers);
+        // V
+        for (int i = 0; i <= 0xF; ++i) {
+            String iAsHexString = Integer.toHexString(i).toUpperCase();
+            valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.V[i]).toUpperCase();
 
+            newRegister = new Register("V" + iAsHexString, valueOfRegisterAsHexString);
+            registers.add(newRegister);
+        }
+
+        table.setItems(registers);
     }
 }
