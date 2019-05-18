@@ -902,18 +902,194 @@ public class CPUTest {
 
     @Test
     public void opcode9XY0() {
+        basicInitialization();
+
+        byte X = 0xE;
+        byte Y = 0xC;
+        char PC = 0x0234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x90 | X);
+        memory.RAM[memory.PC + 1] = (byte)((Y << 4) | 0x00);
+
+        memory.V[X] = (byte) 245;
+        memory.V[Y] = (byte) 245;
+
+        cpu.opcode9XY0();
+        assertEquals(PC + 2, memory.PC);
+
+
+        memory.PC = PC;
+
+        memory.V[X] = (byte) 245;
+        memory.V[Y] = (byte) 232;
+
+        cpu.opcode9XY0();
+        assertEquals(PC + 4, memory.PC);
+}
+
+    @Test
+    public void opcode9XY0ver2() {
+        basicInitialization();
+
+        byte X = 0xE;
+        byte Y = 0xC;
+        char PC = 0x0234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0x90 | X);
+        memory.RAM[memory.PC + 1] = (byte)((Y << 4) | 0x00);
+
+        memory.V[X] = (byte) 125;
+        memory.V[Y] = (byte) 125;
+
+        cpu.nextTick();
+        assertEquals(PC + 2, memory.PC);
+
+
+        memory.PC = PC;
+
+        memory.V[X] = (byte) 0b10101010;
+        memory.V[Y] = (byte) 0b00101010;
+
+        cpu.nextTick();
+        assertEquals(PC + 4, memory.PC);
     }
 
     @Test
     public void opcodeANNN() {
+        basicInitialization();
+
+        char NNN = 0x0F13;
+        char PC = 0x0734;
+        char I = 0x1234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xA0 | (NNN >>> 8) );
+        memory.RAM[memory.PC + 1] = (byte)(NNN & 0x0FF);
+
+        memory.I = I;
+
+        cpu.opcodeANNN();
+        assertEquals(NNN, memory.I);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeANNNver2() {
+        basicInitialization();
+
+        char NNN = 0x0F13;
+        char PC = 0x0734;
+        char I = 0x1234;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xA0 | (NNN >>> 8) );
+        memory.RAM[memory.PC + 1] = (byte)(NNN & 0x0FF);
+
+        memory.I = I;
+
+        cpu.nextTick();
+        assertEquals(NNN, memory.I);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeBNNN() {
+        basicInitialization();
+
+        char NNN = 0x0F13;
+        char PC = 0x0734;
+        char V0 = 0xF1;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xB0 | (NNN >>> 8) );
+        memory.RAM[memory.PC + 1] = (byte)(NNN & 0x0FF);
+
+        memory.V[0] = (byte) V0;
+
+        cpu.opcodeBNNN();
+        assertEquals(NNN + V0, memory.PC);
+    }
+
+    @Test
+    public void opcodeBNNNver2() {
+        basicInitialization();
+
+        char NNN = 0x0F13;
+        char PC = 0x0734;
+        char V0 = 0xF1;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xB0 | (NNN >>> 8) );
+        memory.RAM[memory.PC + 1] = (byte)(NNN & 0x0FF);
+
+        memory.V[0] = (byte) V0;
+
+        cpu.nextTick();
+        assertEquals(NNN + V0, memory.PC);
     }
 
     @Test
     public void opcodeCXNN() {
+        basicInitialization();
+
+        int X = 0xF;
+        char PC = 0x0734;
+
+        byte NN = (byte) 0b10101010;
+        byte negationOfNN = (byte) ~NN;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xC0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(NN & 0xFF);
+
+        cpu.opcodeCXNN();
+        int VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
+
+        cpu.opcodeCXNN();
+        VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
+
+        cpu.opcodeCXNN();
+        VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
+
+        cpu.opcodeCXNN();
+        VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
+    }
+
+    @Test
+    public void opcodeCXNNver2() {
+        basicInitialization();
+
+        int X = 0xF;
+        char PC = 0x0734;
+
+        byte NN = (byte) 0b10101010;
+        byte negationOfNN = (byte) ~NN;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xC0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(NN & 0xFF);
+
+        cpu.nextTick();
+        int VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
+
+        cpu.nextTick();
+        VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
+
+        cpu.nextTick();
+        VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
+
+        cpu.nextTick();
+        VX = memory.V[X];
+        assertEquals(0, VX & negationOfNN);
     }
 
     @Test
