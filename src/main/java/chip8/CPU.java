@@ -3,6 +3,8 @@ package chip8;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Random;
+
 public class CPU {
 
     @Getter @Setter
@@ -12,8 +14,9 @@ public class CPU {
     @Getter @Setter
     private Screen screen;
 
+    private boolean changeOnScreen = false;
 
-    boolean changeOnScreen = false;
+    private Random RNG = new Random();
 
     public boolean wasChangeOnScreen() {
         return changeOnScreen;
@@ -431,20 +434,40 @@ public class CPU {
 
     }
 
-    //  Explanation: Stores the most significant bit of VX
-    //  in VF and then shifts VX to the left by 1.
+    /***
+     *   Skips the next instruction if VX doesn't equal VY.
+     *   (Usually the next instruction is a jump to skip a code block)
+     */
     public void opcode9XY0() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
+        int VX = memory.V[X];
+        int VY = memory.V[Y];
+
+        if (VX != VY)
+            memory.PC += 4;
+        else
+            memory.PC += 2;
     }
 
-    //  Explanation: Sets I to the address NNN.
+    /***
+     *   Sets I to the address NNN.
+     */
     public void opcodeANNN() {
+        int NNN = (fetchOpcode() & 0x0FFF);
 
+        memory.I = (char) NNN;
+        memory.PC += 2;
     }
 
-    //  Explanation: Jumps to the address NNN plus V0.
+    /***
+     *   Jumps to the address NNN plus V0.
+     */
     public void opcodeBNNN() {
+        int NNN = (fetchOpcode() & 0x0FFF);
 
+        memory.PC = (char) (NNN + (memory.V[0] & 0xFF) );
     }
 
     /**
@@ -452,7 +475,13 @@ public class CPU {
      * on a random number (Typically: 0 to 255) and NN.
      */
     public void opcodeCXNN() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int NN = (fetchOpcode() & 0x00FF);
+        int randomByte = RNG.nextInt() & 0xFF;
 
+        byte result = (byte) (NN & randomByte);
+
+        memory.V[X] = result;
     }
 
     /**
