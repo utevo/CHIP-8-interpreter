@@ -1,19 +1,28 @@
 package chip8.app;
 
+import chip8.CPU;
 import chip8.Keyboard;
+import chip8.Memory;
 import chip8.Screen;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 
 public class CHIP8App extends Application {
+
+    CPU cpu;
+    Keyboard keyboard;
+    Memory memory;
+    Screen screen;
+
+    ScreenApp screenApp;
 
     private static final int SCREEN_WIDTH = 800;
     private static final int SCREEN_HEIGHT = 400;
@@ -87,16 +96,34 @@ public class CHIP8App extends Application {
 
         primaryStage.setTitle("CHIP-8 emulator");
 
+        Memory memory = new Memory();
+        Keyboard keyboard = new Keyboard();
+        Screen screen = new Screen();
+
+        CPU cpu = new CPU(memory, keyboard, screen);
+
+
+
         VBox layout = new VBox();
 
         menuBar = createMenuBar();
         layout.getChildren().add(menuBar);
 
-        Screen screen = new Screen();
-        ScreenApp screenApp = new ScreenApp(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+        screenApp = new ScreenApp(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
         layout.getChildren().add(screenApp);
-        screenApp.render();
+
+
+        // screenApp.render();
+        Button button = new Button();
+        button.setText("Open a New Window");
+
+        DebugInfoApp debugInfoApp = new DebugInfoApp(cpu);
+
+        button.setOnAction(e -> debugInfoApp.show() );
+
+        layout.getChildren().add(button);
+
+
 
         Scene scene = new Scene(layout);
 
