@@ -15,11 +15,13 @@ public class Screen {
         pixels[y][x] = true;
     }
 
-    public void flipPixel(int x, int y) {
+    public boolean flipPixel(int x, int y) {
         if (pixels[y][x] == true)
             pixels[y][x] = false;
         else
             pixels[y][x] = true;
+
+        return pixels[y][x];
     }
 
     public void clear() {
