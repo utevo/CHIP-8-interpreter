@@ -493,7 +493,37 @@ public class CPU {
      * when the sprite is drawn, and to 0 if that doesn’t happen
      */
     public void opcodeDXYN() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int Y = (fetchOpcode() & 0x00F0) >>> 4;
+        int N = (fetchOpcode() & 0x000F);
+        int I = memory.I;
 
+        byte VX = memory.V[X];
+        byte VY = memory.V[Y];
+
+        memory.V[0xF] = 0x0;
+
+        for (int y = 0; y < N; ++y) {
+            byte byteOfPixels = memory.RAM[I + y];
+
+            for (int x = 0; x < 8; ++x) {
+                boolean pixel;
+                if ((byteOfPixels & (0x80 >>> x)) != 0)
+                    pixel = true;
+                else
+                    pixel = false;
+
+                if (pixel == true) {
+                    int cordX = (x + VX) % Screen.WIDTH;
+                    int cordY = (y + VY) % Screen.HEIGHT;
+
+                    if (screen.flipPixel(cordX, cordY) == false)
+                        memory.V[0xF] = 0x1;
+                }
+            }
+        }
+        memory.PC += 2;
+        changeOnScreen = true;
     }
 
     /**
@@ -501,7 +531,13 @@ public class CPU {
      * (Usually the next instruction is a jump to skip a code block)
      */
     public void opcodeEX9E() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        byte VX = memory.V[X];
 
+        if (keyboard.isPressed(VX))
+            memory.PC += 4;
+        else
+            memory.PC += 2;
     }
 
     /**
@@ -509,42 +545,78 @@ public class CPU {
      * (Usually the next instruction is a jump to skip a code block)
      */
     public void opcodeEXA1() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        byte VX = memory.V[X];
 
+        if (keyboard.isPressed(VX))
+            memory.PC += 2;
+        else
+            memory.PC += 4;
     }
 
     /**
      * Sets VX to the value of the delay timer.
      */
     public void opcodeFX07() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
 
+        memory.V[X] = memory.delayTimer;
+        memory.PC += 2;
     }
 
     /**
      * A key press is awaited, and then stored in VX.
      */
     public void opcodeFX0A() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
 
+        byte theNumberOfKey = -1;
+        for (byte i = 0; i < Keyboard.NUMBER_OF_KEYS; ++i) {
+            if (keyboard.isPressed(i)) {
+                theNumberOfKey = i;
+                break;
+            }
+        }
+
+        if (theNumberOfKey != -1) {
+            memory.V[X] = theNumberOfKey;
+            memory.PC += 2;
+        }
+        else { // it work a little diffrently than it should
+            memory.delayTimer += 1;
+            memory.soundTimer += 1;
+        }
     }
 
     /**
      * Sets the delay timer to VX.
      */
     public void opcodeFX15() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
 
+        memory.delayTimer = memory.V[X];
+        memory.PC += 2;
     }
 
     /**
      * Sets the sound timer to VX.
      */
     public void opcodeFX18() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
 
+        memory.soundTimer = memory.V[X];
+        memory.PC += 2;
     }
 
     /**
      * Adds VX to I.
      */
     public void opcodeFX1E() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int VX = (memory.V[X] & 0xFF);
 
+        memory.I += VX;
+        memory.PC += 2;
     }
 
     /**

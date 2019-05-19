@@ -1094,34 +1094,329 @@ public class CPUTest {
 
     @Test
     public void opcodeDXYN() {
+//        memory.I = 123;
+//        memory.RAM[memory.I] =      (byte) 0b10101010;
+//        memory.RAM[memory.I + 1] =  (byte) 0b00000000;
+//        memory.RAM[memory.I + 2] =  (byte) 0b01101011;
+//        memory.RAM[memory.I + 3] =  (byte) 0b10101010;
+//        memory.RAM[memory.I + 4] =  (byte) 0b10101010;
+//
+//        memory.PC = 0;
+//        memory.V[0] = 62;
+//        memory.V[1] = 12;
+//
+//        memory.RAM[0] = (byte) (0xD0 | 0x00);
+//        memory.RAM[1] = (byte) (0x10 | 0x05);
     }
 
     @Test
     public void opcodeEX9E() {
+        basicInitialization();
+
+        byte X = 0x9;
+        char PC = 0x0734;
+        byte VX = 0xA;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xE0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x9E);
+        memory.V[X] = VX;
+
+        keyboard.setKeyDown(VX);
+
+        cpu.opcodeEX9E();
+        assertEquals(PC + 2, memory.PC);
+
+        memory.PC = PC;
+        keyboard.setKeyUp(VX);
+
+        cpu.opcodeEX9E();
+        assertEquals(PC + 4, memory.PC);
+    }
+
+    @Test
+    public void opcodeEX9Ever2() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0234;
+        byte VX = 0x1;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xE0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x9E);
+        memory.V[X] = VX;
+
+        keyboard.setKeyDown(VX);
+
+        cpu.nextTick();
+        assertEquals(PC + 2, memory.PC);
+
+        memory.PC = PC;
+        keyboard.setKeyUp(VX);
+
+        cpu.nextTick();
+        assertEquals(PC + 4, memory.PC);
     }
 
     @Test
     public void opcodeEXA1() {
+        basicInitialization();
+
+        byte X = 0x9;
+        char PC = 0x0734;
+        byte VX = 0xA;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xE0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0xA1);
+        memory.V[X] = VX;
+
+        keyboard.setKeyDown(VX);
+
+        cpu.opcodeEXA1();
+        assertEquals(PC + 4, memory.PC);
+
+        memory.PC = PC;
+        keyboard.setKeyUp(VX);
+
+        cpu.opcodeEXA1();
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeEXA1ver2() {
+        basicInitialization();
+
+        byte X = 0x9;
+        char PC = 0x0734;
+        byte VX = 0xA;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xE0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0xA1);
+        memory.V[X] = VX;
+
+        keyboard.setKeyDown(VX);
+
+        cpu.nextTick();
+        assertEquals(PC + 4, memory.PC);
+
+        memory.PC = PC;
+        keyboard.setKeyUp(VX);
+
+        cpu.nextTick();
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX07() {
+        basicInitialization();
+
+        byte X = 0x9;
+        char PC = 0x0734;
+        byte delayTimer = 123;
+        byte VX = 0x12;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x07);
+        memory.delayTimer = delayTimer;
+        memory.V[X] = VX;
+
+        cpu.opcodeFX07();
+        assertEquals(delayTimer, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX07ver2() {
+        basicInitialization();
+
+        byte X = 0x1;
+        char PC = 0x0334;
+        byte delayTimer = (byte) 0xF3;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x07);
+        memory.delayTimer = delayTimer;
+
+        cpu.nextTick();
+        assertEquals(delayTimer, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX0A() {
+        basicInitialization();
+
+        byte X = 0x7;
+        char PC = 0x0334;
+        byte VX = (byte) 0x87;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x0A);
+        memory.V[X] = VX;
+
+        cpu.opcodeFX0A();
+        assertEquals(VX, memory.V[X]);
+        assertEquals(PC, memory.PC);
+
+
+        byte pressedKey = 0xF;
+        keyboard.setKeyUp(pressedKey);
+
+        cpu.opcodeFX0A();
+        assertEquals(pressedKey, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX0Aver2() {
+        basicInitialization();
+
+        byte X = 0x7;
+        char PC = 0x0334;
+        byte VX = (byte) 0x87;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x0A);
+        memory.V[X] = VX;
+
+        cpu.nextTick();
+        assertEquals(VX, memory.V[X]);
+        assertEquals(PC, memory.PC);
+
+
+        byte pressedKey = 0xF;
+        keyboard.setKeyUp(pressedKey);
+
+        cpu.nextTick();
+        assertEquals(pressedKey, memory.V[X]);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX15() {
+        basicInitialization();
+
+        byte X = 0x9;
+        char PC = 0x0734;
+        byte VX = 0x39;
+        byte delayTimer = 0x72;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x15);
+        memory.V[X] = VX;
+        memory.delayTimer = delayTimer;
+
+        cpu.opcodeFX15();
+        assertEquals(VX, memory.delayTimer);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX15ver2() {
+        basicInitialization();
+
+        byte X = 0x9;
+        char PC = 0x0734;
+        byte VX = 0x39;
+        byte delayTimer = 0x72;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x15);
+        memory.V[X] = VX;
+        memory.delayTimer = delayTimer;
+
+        cpu.nextTick();
+        assertEquals(VX, memory.delayTimer);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX18() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        byte VX = 0x72;
+        byte soundTimer = 0x72;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x18);
+        memory.V[X] = VX;
+        memory.soundTimer = soundTimer;
+
+        cpu.opcodeFX18();
+        assertEquals(VX, memory.soundTimer);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX18ver2() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        byte VX = 0x72;
+        byte soundTimer = 0x72;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x18);
+        memory.V[X] = VX;
+        memory.soundTimer = soundTimer;
+
+        cpu.nextTick();
+        assertEquals(VX, memory.soundTimer);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX1E() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        int VX = 0xF2;
+        char I = 0x1213;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x1E);
+        memory.I = I;
+        memory.V[X] = (byte) VX;
+
+        cpu.opcodeFX1E();
+        assertEquals(I + VX, memory.I);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX1Ever2() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        int VX = 0xF2;
+        char I = 0x1213;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x1E);
+        memory.I = I;
+        memory.V[X] = (byte) VX;
+
+        cpu.nextTick();
+        assertEquals(I + VX, memory.I);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
