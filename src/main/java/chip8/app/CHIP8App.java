@@ -120,6 +120,20 @@ public class CHIP8App extends Application {
 
         registersInfoApp = new RegistersInfoApp(cpu);
 
+        /*                  ***                  */
+        Button button1 = new Button("refresh screen");
+        button1.setOnAction(e -> screenApp.render() );
+        layout.getChildren().add(button1);
+
+        Button button2 = new Button("refresh register info");
+        button2.setOnAction(e -> registersInfoApp.refresh());
+        layout.getChildren().add(button2);
+
+        Button button3 = new Button("next Instruction");
+        button3.setOnAction(e -> cpu.nextTick());
+        layout.getChildren().add(button3);
+        /*                  ***                  */
+
         Scene scene = new Scene(layout);
 
         primaryStage.setScene(scene);
