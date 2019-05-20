@@ -28,7 +28,6 @@ public class CPU {
         this.screen = screen;
     }
 
-
     public char fetchOpcode() {
         int a = memory.RAM[memory.PC] & 0xFF;
         int b = memory.RAM[memory.PC + 1] & 0xFF;
@@ -37,173 +36,181 @@ public class CPU {
         return result;
     }
 
+    public void tickOfClocks() {
+        if (memory.soundTimer > 0)
+            memory.soundTimer -= 1;
+        if (memory.delayTimer > 0)
+            memory.delayTimer -= 1;
+    }
+
     public void nextTick() throws IllegalStateException {
         char opcode = fetchOpcode();
 
         switch (opcode & 0xF000) {
-
             case 0x0000:
                 if ((opcode & 0x00FF) == 0x00E0) {
                     opcode00E0();
-                    return;
+                    break;
                 }
                 else if ((opcode & 0x00FF) == 0x00EE) {
                     opcode00EE();
-                    return;
+                    break;
                 }
                 else {
-                    throw new IllegalStateException("WRONG OPCODE");
+                    throw new IllegalStateException("WRONG OPCODE: " + (int) opcode);
                 }
 
             case 0x1000:
                 opcode1NNN();
-                return;
+                break;
 
             case 0x2000:
                 opcode2NNN();
-                return;
+                break;
 
             case 0x3000:
                 opcode3XNN();
-                return;
+                break;
 
             case 0x4000:
                 opcode4XNN();
-                return;
+                break;
 
             case 0x5000:
                 opcode5XY0();
-                return;
+                break;
 
             case 0x6000:
                 opcode6XNN();
-                return;
+                break;
 
             case 0x7000:
                 opcode7XNN();
-                return;
+                break;
 
             case 0x8000:
                 switch (opcode & 0xF00F) {
 
                     case 0x8000:
                         opcode8XY0();
-                        return;
+                        break;
 
                     case 0x8001:
                         opcode8XY1();
-                        return;
+                        break;
 
                     case 0x8002:
                         opcode8XY2();
-                        return;
+                        break;
 
                     case 0x8003:
                         opcode8XY3();
-                        return;
+                        break;
 
                     case 0x8004:
                         opcode8XY4();
-                        return;
+                        break;
 
                     case 0x8005:
                         opcode8XY5();
-                        return;
+                        break;
 
                     case 0x8006:
                         opcode8XY6();
-                        return;
+                        break;
 
                     case 0x8007:
                         opcode8XY7();
-                        return;
+                        break;
 
                     case 0x800E:
                         opcode8XYE();
-                        return;
+                        break;
 
                     default:
-                        throw new IllegalStateException("WRONG OPCODE!");
+                        throw new IllegalStateException("WRONG OPCODE: " + (int) opcode);
                 }
+                break;
 
             case 0x9000:
                 opcode9XY0();
-                return;
+                break;
 
             case 0xA000:
                 opcodeANNN();
-                return;
+                break;
 
             case 0xB000:
                 opcodeBNNN();
-                return;
+                break;
 
             case 0xC000:
                 opcodeCXNN();
-                return;
+                break;
 
             case 0xD000:
                 opcodeDXYN();
-                return;
+                break;
 
             case 0xE000:
                 if ((opcode & 0xF0FF) == 0xE09E) {
                     opcodeEX9E();
-                    return;
+                    break;
                 }
                 else if ((opcode & 0xF0FF) == 0xE0A1) {
                     opcodeEXA1();
-                    return;
+                    break;
                 }
                 else {
-                    throw new IllegalStateException("WRONG OPCODE");
+                    throw new IllegalStateException("WRONG OPCODE: " + (int) opcode);
                 }
 
             case 0xF000:
                 switch (opcode & 0xF0FF) {
-
                     case 0xF007:
                         opcodeFX07();
-                        return;
+                        break;
 
                     case 0xF00A:
                         opcodeFX0A();
-                        return;
+                        System.out.println("Halo?");
+                        break;
 
                     case 0xF015:
                         opcodeFX15();
-                        return;
+                        break;
 
                     case 0xF018:
                         opcodeFX18();
-                        return;
+                        break;
 
                     case 0xF01E:
                         opcodeFX1E();
-                        return;
+                        break;
 
                     case 0xF029:
                         opcodeFX29();
-                        return;
+                        break;
 
                     case 0xF033:
                         opcodeFX33();
-                        return;
+                        break;
 
                     case 0xF055:
                         opcodeFX55();
-                        return;
+                        break;
 
                     case 0xF065:
                         opcodeFX65();
-                        return;
+                        break;
 
                     default:
-                        throw new IllegalStateException("WRONG OPCODE");
+                        throw new IllegalStateException("WRONG OPCODE: " + (int) opcode);
                 }
+                break;
 
             default:
-                throw new IllegalStateException("WRONG OPCODE");
+                throw new IllegalStateException("WRONG OPCODE: " + (int) opcode);
         }
 
     }
@@ -238,7 +245,7 @@ public class CPU {
      */
     public void opcode2NNN() {
         ++memory.SP;
-        memory.stack[memory.SP] = memory.PC;
+        memory.stack[memory.SP] = (char) (memory.PC + 2);
 
         char newAddress = (char)(fetchOpcode() & 0x0FFF);
         memory.PC = newAddress;
@@ -293,7 +300,7 @@ public class CPU {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
         int NN = (fetchOpcode() & 0x00FF);
 
-        memory.V[X] = (byte)NN;
+        memory.V[X] = (byte) NN;
         memory.PC += 2;
     }
 
@@ -304,7 +311,7 @@ public class CPU {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
         int NN = (fetchOpcode() & 0x00FF);
 
-        memory.V[X] += (byte)NN;
+        memory.V[X] += NN;
         memory.PC += 2;
     }
 
@@ -327,7 +334,7 @@ public class CPU {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
         int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
-        memory.V[X] |= memory.V[Y];
+        memory.V[X] = (byte)((memory.V[X] & 0xFF) | (memory.V[Y] & 0xFF));
         memory.PC += 2;
     }
 
@@ -339,7 +346,7 @@ public class CPU {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
         int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
-        memory.V[X] &= memory.V[Y];
+        memory.V[X] = (byte)((memory.V[X] & 0xFF) & (memory.V[Y] & 0xFF));
         memory.PC += 2;
     }
 
@@ -350,7 +357,7 @@ public class CPU {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
         int Y = (fetchOpcode() & 0x00F0) >>> 4;
 
-        memory.V[X] ^= memory.V[Y];
+        memory.V[X] = (byte)((memory.V[X] & 0xFF) ^ (memory.V[Y] & 0xFF));
         memory.PC += 2;
     }
 
@@ -368,7 +375,7 @@ public class CPU {
         else
             memory.V[0xF] = 0x0;
 
-        memory.V[X] += memory.V[Y];
+        memory.V[X] = (byte) ((memory.V[X] & 0xFF) + (memory.V[Y] & 0xFF));
         memory.PC += 2;
     }
 
@@ -385,7 +392,7 @@ public class CPU {
         else
             memory.V[0xF] = 0x0;
 
-        memory.V[X] = (byte)((memory.V[X] - memory.V[Y]) & 0xFF);
+        memory.V[X] = (byte)((memory.V[X] & 0xFF) - (memory.V[Y] & 0xFF));
         memory.PC += 2;
     }
 
@@ -415,7 +422,7 @@ public class CPU {
         else
             memory.V[0xF] = 0x0;
 
-        memory.V[X] = (byte)((memory.V[Y] - memory.V[X]) & 0xFF);
+        memory.V[X] = (byte)((memory.V[Y] & 0xFF) - (memory.V[X] & 0xFF));
         memory.PC += 2;
 
     }
@@ -431,7 +438,6 @@ public class CPU {
 
         memory.V[X] = (byte)((memory.V[X] & 0xFF) << 1);
         memory.PC += 2;
-
     }
 
     /***
@@ -482,6 +488,7 @@ public class CPU {
         byte result = (byte) (NN & randomByte);
 
         memory.V[X] = result;
+        memory.PC += 2;
     }
 
     /**
@@ -582,10 +589,6 @@ public class CPU {
             memory.V[X] = theNumberOfKey;
             memory.PC += 2;
         }
-        else { // it work a little diffrently than it should
-            memory.delayTimer += 1;
-            memory.soundTimer += 1;
-        }
     }
 
     /**
@@ -624,7 +627,11 @@ public class CPU {
      * Characters 0-F (in hexadecimal) are represented by a 4x5 font.
      */
     public void opcodeFX29() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int VX = (memory.V[X] & 0xFF);
 
+        memory.I = (char) (5 * VX);
+        memory.PC += 2;
     }
 
     /**
@@ -636,7 +643,15 @@ public class CPU {
      * location I+1, and the ones digit at location I+2.)
      */
     public void opcodeFX33() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int VX = (memory.V[X] & 0xFF);
+        int I = memory.I;
 
+        memory.RAM[I] = (byte) (VX / 100);
+        memory.RAM[I + 1] = (byte) ((VX / 10) % 10);
+        memory.RAM[I + 2] = (byte) (VX % 10);
+
+        memory.PC += 2;
     }
 
     /**
@@ -645,7 +660,11 @@ public class CPU {
      * but I itself is left unmodified.
      */
     public void opcodeFX55() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int I = memory.I;
 
+        System.arraycopy(memory.V, 0, memory.RAM, I, X);
+        memory.PC += 2;
     }
 
     /**
@@ -654,7 +673,11 @@ public class CPU {
      * but I itself is left unmodified.
      */
     public void opcodeFX65() {
+        int X = (fetchOpcode() & 0x0F00) >>> 8;
+        int I = memory.I;
 
+        System.arraycopy(memory.RAM, I, memory.V,0, X);
+        memory.PC += 2;
     }
 
 }

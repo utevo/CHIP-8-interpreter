@@ -34,8 +34,4 @@ public class Screen {
         return pixels[y][x];
     }
 
-
-
-
-
 }
