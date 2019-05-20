@@ -137,7 +137,6 @@ public class CPUTest {
     public void opcode2NNN() {
         basicInitialization();
 
-
         char NNN = 0x0865;
         byte oldSP = 3;
         char PC = 0x0479;
@@ -151,7 +150,7 @@ public class CPUTest {
         cpu.opcode2NNN();
         assertEquals(NNN, memory.PC);
         assertEquals(oldSP + 1, memory.SP);
-        assertEquals(PC, memory.stack[memory.SP]);
+        assertEquals(PC + 2, memory.stack[memory.SP]);
     }
 
     @Test
@@ -172,7 +171,7 @@ public class CPUTest {
         cpu.nextTick();
         assertEquals(NNN, memory.PC);
         assertEquals(oldSP + 1, memory.SP);
-        assertEquals(PC, memory.stack[memory.SP]);
+        assertEquals(PC + 2, memory.stack[memory.SP]);
     }
 
     @Test
@@ -1078,14 +1077,17 @@ public class CPUTest {
         cpu.nextTick();
         int VX = memory.V[X];
         assertEquals(0, VX & negationOfNN);
+        memory.PC = PC;
 
         cpu.nextTick();
         VX = memory.V[X];
         assertEquals(0, VX & negationOfNN);
+        memory.PC = PC;
 
         cpu.nextTick();
         VX = memory.V[X];
         assertEquals(0, VX & negationOfNN);
+        memory.PC = PC;
 
         cpu.nextTick();
         VX = memory.V[X];
@@ -1277,7 +1279,7 @@ public class CPUTest {
     public void opcodeFX0Aver2() {
         basicInitialization();
 
-        byte X = 0x7;
+        byte X = 0x0;
         char PC = 0x0334;
         byte VX = (byte) 0x87;
 
@@ -1421,18 +1423,220 @@ public class CPUTest {
 
     @Test
     public void opcodeFX29() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        int VX = 0xE;
+        char I = 0x1213;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x29);
+        memory.I = I;
+        memory.V[X] = (byte) VX;
+
+        cpu.opcodeFX29();
+        assertEquals(5 * VX, memory.I);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX29ver2() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        int VX = 0xE;
+        char I = 0x1213;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x29);
+        memory.I = I;
+        memory.V[X] = (byte) VX;
+
+        cpu.nextTick();
+        assertEquals(5 * VX, memory.I);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX33() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        int VX = 123;
+        char I = 0x213;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x33);
+        memory.I = I;
+        memory.V[X] = (byte) VX;
+
+        cpu.opcodeFX33();
+        // VX = 123
+        assertEquals(1, memory.RAM[I]);
+        assertEquals(2, memory.RAM[I + 1]);
+        assertEquals(3, memory.RAM[I + 2]);
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX33ver2() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        int VX = 249;
+        char I = 0x0713;
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x33);
+        memory.I = I;
+        memory.V[X] = (byte) VX;
+
+        cpu.opcodeFX33();
+        // VX = 249
+        assertEquals(2, memory.RAM[I]);
+        assertEquals(4, memory.RAM[I + 1]);
+        assertEquals(9, memory.RAM[I + 2]);
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX55() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        char I = 0x213;
+
+        byte []V = {
+                (byte) 0xF0, (byte) 0x90, (byte) 0x90, (byte) 0x90,
+                (byte) 0xF0, (byte) 0x20, (byte) 0x60, (byte) 0x20,
+                (byte) 0x20, (byte) 0x70, (byte) 0xF0, (byte) 0x10,
+                (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0xF0
+        };
+
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x55);
+        memory.I = I;
+
+        System.arraycopy(V,0, memory.V,0, V.length);
+
+        cpu.opcodeFX55();
+        for (int i = 0; i < X; ++i) {
+            assertEquals(memory.V[i], memory.RAM[I + i]);
+        }
+        for (int i = X; i < 16; ++i) {
+            assertEquals(0, memory.RAM[I + i]);
+        }
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX55ver2() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        char I = 0x213;
+
+        byte []V = {
+                (byte) 0xF0, (byte) 0x90, (byte) 0x90, (byte) 0x90,
+                (byte) 0xF0, (byte) 0x20, (byte) 0x60, (byte) 0x20,
+                (byte) 0x20, (byte) 0x70, (byte) 0xF0, (byte) 0x10,
+                (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0xF0
+        };
+
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x55);
+        memory.I = I;
+
+        System.arraycopy(V,0, memory.V,0, V.length);
+
+        cpu.nextTick();
+        for (int i = 0; i < X; ++i) {
+            assertEquals(memory.V[i], memory.RAM[I + i]);
+        }
+        for (int i = X; i < 16; ++i) {
+            assertEquals(0, memory.RAM[I + i]);
+        }
+        assertEquals(PC + 2, memory.PC);
     }
 
     @Test
     public void opcodeFX65() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        char I = 0x213;
+
+        byte []data = {
+                (byte) 0xF0, (byte) 0x90, (byte) 0x90, (byte) 0x90,
+                (byte) 0xF0, (byte) 0x20, (byte) 0x60, (byte) 0x20,
+                (byte) 0x20, (byte) 0x70, (byte) 0xF0, (byte) 0x10,
+                (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0xF0
+        };
+
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x65);
+        memory.I = I;
+
+        System.arraycopy(data,0, memory.RAM,I, data.length);
+
+        cpu.opcodeFX55();
+        for (int i = 0; i < X; ++i) {
+            assertEquals(memory.RAM[I + i], memory.V[i]);
+        }
+        for (int i = X; i < 16; ++i) {
+            assertEquals(0, memory.V[i]);
+        }
+        assertEquals(PC + 2, memory.PC);
+    }
+
+    @Test
+    public void opcodeFX65ver2() {
+        basicInitialization();
+
+        byte X = 0xC;
+        char PC = 0x0124;
+        char I = 0x213;
+
+        byte []data = {
+                (byte) 0xF0, (byte) 0x90, (byte) 0x90, (byte) 0x90,
+                (byte) 0xF0, (byte) 0x20, (byte) 0x60, (byte) 0x20,
+                (byte) 0x20, (byte) 0x70, (byte) 0xF0, (byte) 0x10,
+                (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0xF0
+        };
+
+
+        memory.PC = PC;
+        memory.RAM[memory.PC] = (byte)(0xF0 | X );
+        memory.RAM[memory.PC + 1] = (byte)(0x65);
+        memory.I = I;
+
+        System.arraycopy(data,0, memory.RAM,I, data.length);
+
+        cpu.nextTick();
+        for (int i = 0; i < X; ++i) {
+            assertEquals(memory.RAM[I + i], memory.V[i]);
+        }
+        for (int i = X; i < 16; ++i) {
+            assertEquals(0, memory.V[i]);
+        }
+        assertEquals(PC + 2, memory.PC);
     }
 
 }
