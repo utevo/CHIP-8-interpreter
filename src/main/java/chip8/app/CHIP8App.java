@@ -1,28 +1,32 @@
 package chip8.app;
 
-import chip8.CPU;
-import chip8.Keyboard;
-import chip8.Memory;
-import chip8.Screen;
+import chip8.*;
 import chip8.app.debug.RegistersInfoApp;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.io.File;
 
 
 public class CHIP8App extends Application {
 
-    CPU cpu;
-    Keyboard keyboard;
-    Memory memory;
-    Screen screen;
+    private CPU cpu;
+    private Keyboard keyboard;
+    private Memory memory;
+    private Screen screen;
+
+    private CHIP8 chip8;
 
     RegistersInfoApp registersInfoApp;
 
     ScreenApp screenApp;
+
+    Stage stage;
 
     private static final int SCREEN_WIDTH = 800;
     private static final int SCREEN_HEIGHT = 400;
@@ -34,10 +38,22 @@ public class CHIP8App extends Application {
         MenuBar menuBar = new MenuBar();
 
         Menu menuFile = new Menu("File");
+
         MenuItem itemOpenRom = new MenuItem("Open ROM");
-        MenuItem itemExit = new MenuItem("Exit");
+        itemOpenRom.setOnAction(e ->{
+            String path;
+            FileChooser fileChooser = new FileChooser();
+            File file = fileChooser.showOpenDialog(stage);
+            if (file != null) {
+                System.out.println(file.getAbsolutePath());
+                chip8.loadProgram(file);
+                registersInfoApp.refresh();
+            }
+
+
+        });
+
         menuFile.getItems().add(itemOpenRom);
-        menuFile.getItems().add(itemExit);
         menuBar.getMenus().add(menuFile);
 
         Menu menuSaveLoad = new Menu("Save/Load");
@@ -102,6 +118,7 @@ public class CHIP8App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
+        stage = primaryStage;
         primaryStage.setTitle("CHIP-8 emulator");
 
         Memory memory = new Memory();
@@ -109,6 +126,8 @@ public class CHIP8App extends Application {
         Screen screen = new Screen();
 
         CPU cpu = new CPU(memory, keyboard, screen);
+
+        chip8 = new CHIP8(cpu);
 
         VBox layout = new VBox();
 
@@ -121,20 +140,41 @@ public class CHIP8App extends Application {
         registersInfoApp = new RegistersInfoApp(cpu);
 
         /*                  ***                  */
-        Button button1 = new Button("refresh screen");
-        button1.setOnAction(e -> screenApp.render() );
+        Button button1 = new Button("Next tick");
+        button1.setOnAction(e -> {
+            cpu.nextTick();
+            screenApp.render();
+            registersInfoApp.refresh(); }
+        );
         layout.getChildren().add(button1);
+        /*                  ***                  */
 
-        Button button2 = new Button("refresh register info");
-        button2.setOnAction(e -> registersInfoApp.refresh());
+        /*                  ***                  */
+        Button button2 = new Button("Next 50 ticks");
+        button2.setOnAction(e -> {
+            for (int i = 0; i < 50; ++i)
+                cpu.nextTick();
+            screenApp.render();
+            registersInfoApp.refresh(); }
+        );
         layout.getChildren().add(button2);
+        /*                  ***                  */
 
-        Button button3 = new Button("next Instruction");
-        button3.setOnAction(e -> cpu.nextTick());
+        /*                  ***                  */
+        Button button3 = new Button("30 ticks of clocks");
+        button3.setOnAction(e -> {
+            for (int i = 0; i < 30; ++i)
+                chip8.tickOfClocks();
+            registersInfoApp.refresh();
+        }
+        );
         layout.getChildren().add(button3);
         /*                  ***                  */
 
         Scene scene = new Scene(layout);
+
+        screenApp.render();
+        registersInfoApp.refresh();
 
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
