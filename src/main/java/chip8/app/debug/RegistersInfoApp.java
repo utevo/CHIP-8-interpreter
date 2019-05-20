@@ -51,29 +51,49 @@ public class RegistersInfoApp extends Stage {
         String valueOfRegisterAsHexString;
         Register newRegister;
 
+        // RAM[PC]
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.RAM[memory.PC] & 0xFF).toUpperCase();
+        newRegister = new Register("RAM[PC]", valueOfRegisterAsHexString);
+        registers.add(newRegister);
+
+        // RAM[PC + 1]
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.RAM[memory.PC + 1] & 0xFF).toUpperCase();
+        newRegister = new Register("RAM[PC + 1]", valueOfRegisterAsHexString);
+        registers.add(newRegister);
+
         // PC
-        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.PC).toUpperCase();
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.PC & 0xFFFF).toUpperCase();
         newRegister = new Register("PC", valueOfRegisterAsHexString);
         registers.add(newRegister);
 
         // I
-        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.I).toUpperCase();
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.I & 0xFFFF).toUpperCase();
         newRegister = new Register("I", valueOfRegisterAsHexString);
         registers.add(newRegister);
 
         // SP
-        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.SP).toUpperCase();
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.SP & 0xFF).toUpperCase();
         newRegister = new Register("SP", valueOfRegisterAsHexString);
         registers.add(newRegister);
 
         // V
         for (int i = 0; i <= 0xF; ++i) {
             String iAsHexString = Integer.toHexString(i).toUpperCase();
-            valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.V[i]).toUpperCase();
+            valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.V[i] & 0xFF).toUpperCase();
 
             newRegister = new Register("V" + iAsHexString, valueOfRegisterAsHexString);
             registers.add(newRegister);
         }
+
+        // soundTimer
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.soundTimer & 0xFF).toUpperCase();
+        newRegister = new Register("soundTimer", valueOfRegisterAsHexString);
+        registers.add(newRegister);
+
+        // delayTimer
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.delayTimer & 0xFF).toUpperCase();
+        newRegister = new Register("delayTimer", valueOfRegisterAsHexString);
+        registers.add(newRegister);
 
         table.setItems(registers);
     }
