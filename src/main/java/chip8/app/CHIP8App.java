@@ -2,6 +2,7 @@ package chip8.app;
 
 import chip8.*;
 import chip8.app.debug.RegistersInfoApp;
+import chip8.app.keyboard.KeyboardApp;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,18 +23,18 @@ public class CHIP8App extends Application {
 
     private CHIP8 chip8;
 
-    RegistersInfoApp registersInfoApp;
+    private RegistersInfoApp registersInfoApp;
+    private KeyboardApp keyboardApp;
 
     ScreenApp screenApp;
 
-    Stage stage;
+
+    private MenuBar menuBar;
 
     private static final int SCREEN_WIDTH = 800;
     private static final int SCREEN_HEIGHT = 400;
 
-    private MenuBar menuBar;
-
-    private MenuBar createMenuBar() {
+    private MenuBar createMenuBar(Stage stage) {
 
         MenuBar menuBar = new MenuBar();
 
@@ -49,8 +50,6 @@ public class CHIP8App extends Application {
                 chip8.loadProgram(file);
                 registersInfoApp.refresh();
             }
-
-
         });
 
         menuFile.getItems().add(itemOpenRom);
@@ -72,6 +71,40 @@ public class CHIP8App extends Application {
 
 
         return menuBar;
+    }
+
+    private void createDebugButtons (Stage stage, VBox layout) {
+        /*                  ***                  */
+        Button button1 = new Button("Next tick");
+        button1.setOnAction(e -> {
+            cpu.nextTick();
+            screenApp.render();
+            registersInfoApp.refresh(); }
+        );
+        layout.getChildren().add(button1);
+        /*                  ***                  */
+
+        /*                  ***                  */
+        Button button2 = new Button("Next 50 ticks");
+        button2.setOnAction(e -> {
+            for (int i = 0; i < 50; ++i)
+                cpu.nextTick();
+            screenApp.render();
+            registersInfoApp.refresh(); }
+        );
+        layout.getChildren().add(button2);
+        /*                  ***                  */
+
+        /*                  ***                  */
+        Button button3 = new Button("30 ticks of clocks");
+        button3.setOnAction(e -> {
+                    for (int i = 0; i < 30; ++i)
+                        chip8.tickOfClocks();
+                    registersInfoApp.refresh();
+                }
+        );
+        layout.getChildren().add(button3);
+        /*                  ***                  */
     }
 
     private int convert(KeyEvent e) {
@@ -118,63 +151,35 @@ public class CHIP8App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        stage = primaryStage;
+        VBox layout = new VBox();
         primaryStage.setTitle("CHIP-8 emulator");
+
+        menuBar = createMenuBar(primaryStage);
+        layout.getChildren().add(menuBar);
+
 
         Memory memory = new Memory();
         Keyboard keyboard = new Keyboard();
         Screen screen = new Screen();
-
-        CPU cpu = new CPU(memory, keyboard, screen);
-
+        cpu = new CPU(memory, keyboard, screen);
         chip8 = new CHIP8(cpu);
 
-        VBox layout = new VBox();
 
-        menuBar = createMenuBar();
-        layout.getChildren().add(menuBar);
-
+        keyboardApp = new KeyboardApp(keyboard);
         screenApp = new ScreenApp(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
         layout.getChildren().add(screenApp);
-
+        screenApp.render();
         registersInfoApp = new RegistersInfoApp(cpu);
+        registersInfoApp.refresh();
 
-        /*                  ***                  */
-        Button button1 = new Button("Next tick");
-        button1.setOnAction(e -> {
-            cpu.nextTick();
-            screenApp.render();
-            registersInfoApp.refresh(); }
-        );
-        layout.getChildren().add(button1);
-        /*                  ***                  */
 
-        /*                  ***                  */
-        Button button2 = new Button("Next 50 ticks");
-        button2.setOnAction(e -> {
-            for (int i = 0; i < 50; ++i)
-                cpu.nextTick();
-            screenApp.render();
-            registersInfoApp.refresh(); }
-        );
-        layout.getChildren().add(button2);
-        /*                  ***                  */
+        createDebugButtons(primaryStage, layout);
 
-        /*                  ***                  */
-        Button button3 = new Button("30 ticks of clocks");
-        button3.setOnAction(e -> {
-            for (int i = 0; i < 30; ++i)
-                chip8.tickOfClocks();
-            registersInfoApp.refresh();
-        }
-        );
-        layout.getChildren().add(button3);
-        /*                  ***                  */
 
         Scene scene = new Scene(layout);
 
-        screenApp.render();
-        registersInfoApp.refresh();
+        scene.setOnKeyPressed(keyboardApp.getEventHandlerForKeyPressed());
+        scene.setOnKeyReleased(keyboardApp.getEventHandlerForKeyReleased());
 
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
