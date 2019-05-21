@@ -1,5 +1,8 @@
 package chip8;
 
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode
 public class Screen {
 
     public final static int HEIGHT = 32;
@@ -12,11 +15,13 @@ public class Screen {
         pixels[y][x] = true;
     }
 
-    public void flipPixel(int x, int y) {
+    public boolean flipPixel(int x, int y) {
         if (pixels[y][x] == true)
             pixels[y][x] = false;
         else
             pixels[y][x] = true;
+
+        return pixels[y][x];
     }
 
     public void clear() {
@@ -28,9 +33,5 @@ public class Screen {
     public boolean getPixel(int x, int y) {
         return pixels[y][x];
     }
-
-
-
-
 
 }

@@ -1,16 +1,15 @@
 package chip8;
 
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Data
+@Data @EqualsAndHashCode
 public class Keyboard {
+
+    static public final int NUMBER_OF_KEYS = 16;
 
     @Setter(AccessLevel.NONE)
     @Getter(AccessLevel.NONE)
-    private boolean keys[] = new boolean[16];
+    private boolean keys[] = new boolean[NUMBER_OF_KEYS];
 
     public Keyboard() {
         for (int i = 0; i < keys.length; ++i) {
