@@ -60,7 +60,7 @@ public class CPUTest {
 
         screen.setPixel(3,2);
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(new Screen(), screen);
         assertEquals(PC + 2, memory.PC);
     }
@@ -100,7 +100,7 @@ public class CPUTest {
         memory.stack[oldSP] = jumpAddress;
         memory.SP = oldSP;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(jumpAddress, memory.PC);
         assertEquals(oldSP - 1, memory.SP);
     }
@@ -129,7 +129,7 @@ public class CPUTest {
         memory.RAM[memory.PC] = 0x17;
         memory.RAM[memory.PC + 1] = 0x65;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(0x765, memory.PC);
     }
 
@@ -168,7 +168,7 @@ public class CPUTest {
         memory.RAM[memory.PC] = (byte)(0x20 | ((0x0F00 & NNN) >> 8));
         memory.RAM[memory.PC + 1] = (byte)(NNN & 0x00FF);
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(NNN, memory.PC);
         assertEquals(oldSP + 1, memory.SP);
         assertEquals(PC + 2, memory.stack[memory.SP]);
@@ -212,13 +212,13 @@ public class CPUTest {
         memory.RAM[memory.PC + 1] = (byte)(NN & 0x00FF);
 
         memory.V[X] = NN; //should skip
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 4, memory.PC);
 
         memory.PC = PC;
 
         memory.V[X] = notNN; //shouldn't skip
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -260,13 +260,13 @@ public class CPUTest {
         memory.RAM[memory.PC + 1] = (byte)(NN & 0x00FF);
 
         memory.V[X] = notNN; //should skip
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 4, memory.PC);
 
         memory.PC = PC;
 
         memory.V[X] = NN; //shouldn't skip
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -309,14 +309,14 @@ public class CPUTest {
 
         memory.V[X] = 0x12;
         memory.V[Y] = 0x12; //should skip
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 4, memory.PC);
 
         memory.PC = PC;
 
         memory.V[X] = 0x03;
         memory.V[Y] = 0x73; //shouldn't skip
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -353,7 +353,7 @@ public class CPUTest {
         memory.RAM[memory.PC + 1] = (byte)(NN & 0x00FF);
         memory.V[X] = VX; // V[X] != NN
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(NN, memory.V[X]);
         assertEquals(PC + 2, memory.PC);
     }
@@ -395,7 +395,7 @@ public class CPUTest {
 
         char corectResult = (char) VX + NN;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(PC + 2, memory.PC);
     }
@@ -436,7 +436,7 @@ public class CPUTest {
         memory.V[X] = 3;
         memory.V[Y] = 7;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(7, memory.V[Y]);
         assertEquals(memory.V[Y], memory.V[X]);
         assertEquals(PC + 2, memory.PC);
@@ -479,7 +479,7 @@ public class CPUTest {
         memory.V[Y] =             0b01000110;
         byte corectResult = (byte)0b11101111;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(PC + 2, memory.PC);
     }
@@ -521,7 +521,7 @@ public class CPUTest {
         memory.V[Y] =             0b01000110;
         byte corectResult = (byte)0b01000100;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(PC + 2, memory.PC);
     }
@@ -563,7 +563,7 @@ public class CPUTest {
         memory.V[Y] =             0b01000110;
         byte corectResult = (byte)0b10101011;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(PC + 2, memory.PC);
     }
@@ -618,7 +618,7 @@ public class CPUTest {
         memory.V[Y] =             0b01000110;
         byte corectResult = (byte)0b00110011; // without overflow
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x1, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -630,7 +630,7 @@ public class CPUTest {
         memory.V[Y] =             0b01001110;
         corectResult =      (byte)0b01111011; // without overflow
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x0, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -685,7 +685,7 @@ public class CPUTest {
         memory.V[Y] =       (byte)0b01000110;
         byte corectResult = (byte)0b10100111; // with not borrow
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x1, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -697,7 +697,7 @@ public class CPUTest {
         memory.V[Y] =             0b01001110;
         corectResult =      (byte)0b11011111; // without not borrow
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x0, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -750,7 +750,7 @@ public class CPUTest {
         memory.V[X] =       (byte)0b11101101;
         byte corectResult = (byte)0b01110110;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x1, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -761,7 +761,7 @@ public class CPUTest {
         memory.V[X] =       (byte)0b00101100;
         corectResult =      (byte)0b00010110;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x0, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -817,7 +817,7 @@ public class CPUTest {
         memory.V[X] =       (byte)0b01000110;
         byte corectResult = (byte)0b10100111; // with not borrow
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x1, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -829,7 +829,7 @@ public class CPUTest {
         memory.V[X] =       (byte)0b01001110;
         corectResult =      (byte)0b11011111; // without not borrow
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x0, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -882,7 +882,7 @@ public class CPUTest {
         memory.V[X] =       (byte)0b11000110;
         byte corectResult = (byte)0b10001100;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x1, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -893,7 +893,7 @@ public class CPUTest {
         memory.V[X] =       (byte)0b01001110;
         corectResult =      (byte)0b10011100;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(corectResult, memory.V[X]);
         assertEquals(0x0, memory.V[0xF]);
         assertEquals(PC + 2, memory.PC);
@@ -925,7 +925,7 @@ public class CPUTest {
 
         cpu.opcode9XY0();
         assertEquals(PC + 4, memory.PC);
-}
+    }
 
     @Test
     public void opcode9XY0ver2() {
@@ -942,7 +942,7 @@ public class CPUTest {
         memory.V[X] = (byte) 125;
         memory.V[Y] = (byte) 125;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 2, memory.PC);
 
 
@@ -951,7 +951,7 @@ public class CPUTest {
         memory.V[X] = (byte) 0b10101010;
         memory.V[Y] = (byte) 0b00101010;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 4, memory.PC);
     }
 
@@ -988,7 +988,7 @@ public class CPUTest {
 
         memory.I = I;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(NNN, memory.I);
         assertEquals(PC + 2, memory.PC);
     }
@@ -1025,7 +1025,7 @@ public class CPUTest {
 
         memory.V[0] = (byte) V0;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(NNN + V0, memory.PC);
     }
 
@@ -1074,22 +1074,22 @@ public class CPUTest {
         memory.RAM[memory.PC] = (byte)(0xC0 | X );
         memory.RAM[memory.PC + 1] = (byte)(NN & 0xFF);
 
-        cpu.nextTick();
+        cpu.tick();
         int VX = memory.V[X];
         assertEquals(0, VX & negationOfNN);
         memory.PC = PC;
 
-        cpu.nextTick();
+        cpu.tick();
         VX = memory.V[X];
         assertEquals(0, VX & negationOfNN);
         memory.PC = PC;
 
-        cpu.nextTick();
+        cpu.tick();
         VX = memory.V[X];
         assertEquals(0, VX & negationOfNN);
         memory.PC = PC;
 
-        cpu.nextTick();
+        cpu.tick();
         VX = memory.V[X];
         assertEquals(0, VX & negationOfNN);
     }
@@ -1151,13 +1151,13 @@ public class CPUTest {
 
         keyboard.setKeyDown(VX);
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 2, memory.PC);
 
         memory.PC = PC;
         keyboard.setKeyUp(VX);
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 4, memory.PC);
     }
 
@@ -1201,13 +1201,13 @@ public class CPUTest {
 
         keyboard.setKeyDown(VX);
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 4, memory.PC);
 
         memory.PC = PC;
         keyboard.setKeyUp(VX);
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -1217,7 +1217,7 @@ public class CPUTest {
 
         byte X = 0x9;
         char PC = 0x0734;
-        byte delayTimer = 123;
+        char delayTimer = 123;
         byte VX = 0x12;
 
         memory.PC = PC;
@@ -1237,15 +1237,15 @@ public class CPUTest {
 
         byte X = 0x1;
         char PC = 0x0334;
-        byte delayTimer = (byte) 0xF3;
+        char delayTimer = 0xF3;
 
         memory.PC = PC;
         memory.RAM[memory.PC] = (byte)(0xF0 | X );
         memory.RAM[memory.PC + 1] = (byte)(0x07);
         memory.delayTimer = delayTimer;
 
-        cpu.nextTick();
-        assertEquals(delayTimer, memory.V[X]);
+        cpu.tick();
+        assertEquals(delayTimer, (memory.V[X] & 0xFF) );
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -1288,7 +1288,7 @@ public class CPUTest {
         memory.RAM[memory.PC + 1] = (byte)(0x0A);
         memory.V[X] = VX;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(VX, memory.V[X]);
         assertEquals(PC, memory.PC);
 
@@ -1296,7 +1296,7 @@ public class CPUTest {
         byte pressedKey = 0xF;
         keyboard.setKeyUp(pressedKey);
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(pressedKey, memory.V[X]);
         assertEquals(PC + 2, memory.PC);
     }
@@ -1308,7 +1308,7 @@ public class CPUTest {
         byte X = 0x9;
         char PC = 0x0734;
         byte VX = 0x39;
-        byte delayTimer = 0x72;
+        char delayTimer = 0x72;
 
         memory.PC = PC;
         memory.RAM[memory.PC] = (byte)(0xF0 | X );
@@ -1328,7 +1328,7 @@ public class CPUTest {
         byte X = 0x9;
         char PC = 0x0734;
         byte VX = 0x39;
-        byte delayTimer = 0x72;
+        char delayTimer = 0x72;
 
         memory.PC = PC;
         memory.RAM[memory.PC] = (byte)(0xF0 | X );
@@ -1336,7 +1336,7 @@ public class CPUTest {
         memory.V[X] = VX;
         memory.delayTimer = delayTimer;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(VX, memory.delayTimer);
         assertEquals(PC + 2, memory.PC);
     }
@@ -1348,7 +1348,7 @@ public class CPUTest {
         byte X = 0xC;
         char PC = 0x0124;
         byte VX = 0x72;
-        byte soundTimer = 0x72;
+        char soundTimer = 0x72;
 
         memory.PC = PC;
         memory.RAM[memory.PC] = (byte)(0xF0 | X );
@@ -1368,7 +1368,7 @@ public class CPUTest {
         byte X = 0xC;
         char PC = 0x0124;
         byte VX = 0x72;
-        byte soundTimer = 0x72;
+        char soundTimer = 0x72;
 
         memory.PC = PC;
         memory.RAM[memory.PC] = (byte)(0xF0 | X );
@@ -1376,7 +1376,7 @@ public class CPUTest {
         memory.V[X] = VX;
         memory.soundTimer = soundTimer;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(VX, memory.soundTimer);
         assertEquals(PC + 2, memory.PC);
     }
@@ -1416,7 +1416,7 @@ public class CPUTest {
         memory.I = I;
         memory.V[X] = (byte) VX;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(I + VX, memory.I);
         assertEquals(PC + 2, memory.PC);
     }
@@ -1456,7 +1456,7 @@ public class CPUTest {
         memory.I = I;
         memory.V[X] = (byte) VX;
 
-        cpu.nextTick();
+        cpu.tick();
         assertEquals(5 * VX, memory.I);
         assertEquals(PC + 2, memory.PC);
     }
@@ -1531,12 +1531,12 @@ public class CPUTest {
         System.arraycopy(V,0, memory.V,0, V.length);
 
         cpu.opcodeFX55();
-        for (int i = 0; i < X; ++i) {
+        for (int i = 0; i <= X; ++i)
             assertEquals(memory.V[i], memory.RAM[I + i]);
-        }
-        for (int i = X; i < 16; ++i) {
+
+        for (int i = X + 1; i < 16; ++i)
             assertEquals(0, memory.RAM[I + i]);
-        }
+
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -1563,13 +1563,13 @@ public class CPUTest {
 
         System.arraycopy(V,0, memory.V,0, V.length);
 
-        cpu.nextTick();
-        for (int i = 0; i < X; ++i) {
+        cpu.tick();
+        for (int i = 0; i <= X; ++i)
             assertEquals(memory.V[i], memory.RAM[I + i]);
-        }
-        for (int i = X; i < 16; ++i) {
+
+        for (int i = X + 1; i < 16; ++i)
             assertEquals(0, memory.RAM[I + i]);
-        }
+
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -1596,13 +1596,13 @@ public class CPUTest {
 
         System.arraycopy(data,0, memory.RAM,I, data.length);
 
-        cpu.opcodeFX55();
-        for (int i = 0; i < X; ++i) {
+        cpu.opcodeFX65();
+        for (int i = 0; i <= X; ++i)
             assertEquals(memory.RAM[I + i], memory.V[i]);
-        }
-        for (int i = X; i < 16; ++i) {
+
+        for (int i = X + 1; i < 16; ++i)
             assertEquals(0, memory.V[i]);
-        }
+
         assertEquals(PC + 2, memory.PC);
     }
 
@@ -1629,13 +1629,13 @@ public class CPUTest {
 
         System.arraycopy(data,0, memory.RAM,I, data.length);
 
-        cpu.nextTick();
-        for (int i = 0; i < X; ++i) {
+        cpu.tick();
+        for (int i = 0; i <= X; ++i)
             assertEquals(memory.RAM[I + i], memory.V[i]);
-        }
-        for (int i = X; i < 16; ++i) {
+
+        for (int i = X + 1; i < 16; ++i)
             assertEquals(0, memory.V[i]);
-        }
+
         assertEquals(PC + 2, memory.PC);
     }
 
