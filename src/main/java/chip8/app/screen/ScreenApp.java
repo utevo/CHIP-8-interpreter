@@ -1,4 +1,4 @@
-package chip8.app;
+package chip8.app.screen;
 
 import chip8.Screen;
 import javafx.scene.canvas.Canvas;
