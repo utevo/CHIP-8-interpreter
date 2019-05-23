@@ -36,14 +36,14 @@ public class CPU {
         return result;
     }
 
-    public void tickOfClocks() {
+    public void timersTick() {
         if (memory.soundTimer > 0)
             memory.soundTimer -= 1;
         if (memory.delayTimer > 0)
             memory.delayTimer -= 1;
     }
 
-    public void nextTick() throws IllegalStateException {
+    public void tick() throws IllegalStateException {
         char opcode = fetchOpcode();
 
         switch (opcode & 0xF000) {
@@ -57,7 +57,8 @@ public class CPU {
                     break;
                 }
                 else {
-                    throw new IllegalStateException("WRONG OPCODE: " + (int) opcode);
+                    memory.PC += 2;
+                    break;
                 }
 
             case 0x1000:
@@ -173,7 +174,6 @@ public class CPU {
 
                     case 0xF00A:
                         opcodeFX0A();
-                        System.out.println("Halo?");
                         break;
 
                     case 0xF015:
@@ -505,8 +505,8 @@ public class CPU {
         int N = (fetchOpcode() & 0x000F);
         int I = memory.I;
 
-        byte VX = memory.V[X];
-        byte VY = memory.V[Y];
+        int VX = memory.V[X] & 0xFF;
+        int VY = memory.V[Y] & 0xFF;
 
         memory.V[0xF] = 0x0;
 
@@ -567,7 +567,7 @@ public class CPU {
     public void opcodeFX07() {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
 
-        memory.V[X] = memory.delayTimer;
+        memory.V[X] = (byte) (memory.delayTimer & 0xFF);
         memory.PC += 2;
     }
 
@@ -597,7 +597,7 @@ public class CPU {
     public void opcodeFX15() {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
 
-        memory.delayTimer = memory.V[X];
+        memory.delayTimer = (char)(memory.V[X] & 0xFF);
         memory.PC += 2;
     }
 
@@ -607,7 +607,7 @@ public class CPU {
     public void opcodeFX18() {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
 
-        memory.soundTimer = memory.V[X];
+        memory.soundTimer = (char)(memory.V[X] & 0xFF);
         memory.PC += 2;
     }
 
@@ -663,7 +663,7 @@ public class CPU {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
         int I = memory.I;
 
-        System.arraycopy(memory.V, 0, memory.RAM, I, X);
+        System.arraycopy(memory.V, 0, memory.RAM, I, X + 1);
         memory.PC += 2;
     }
 
@@ -676,7 +676,7 @@ public class CPU {
         int X = (fetchOpcode() & 0x0F00) >>> 8;
         int I = memory.I;
 
-        System.arraycopy(memory.RAM, I, memory.V,0, X);
+        System.arraycopy(memory.RAM, I, memory.V,0, X + 1);
         memory.PC += 2;
     }
 

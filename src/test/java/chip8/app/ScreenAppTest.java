@@ -1,11 +1,10 @@
 package chip8.app;
 
 import chip8.Screen;
+import chip8.app.screen.ScreenApp;
 import javafx.scene.canvas.GraphicsContext;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class ScreenAppTest {
 

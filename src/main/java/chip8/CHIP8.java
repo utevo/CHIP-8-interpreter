@@ -33,12 +33,12 @@ public class CHIP8 {
         this.cpu = cpu;
     }
 
-    public void tickOfClocks() {
-        cpu.tickOfClocks();
+    public void timersTick() {
+        cpu.timersTick();
     }
 
-    public void nextTick() throws IllegalStateException {
-        cpu.nextTick();
+    public void cpuTick() throws IllegalStateException {
+        cpu.tick();
     }
 
     public void loadProgram(File file) {

@@ -14,7 +14,7 @@ final class FONTS_DATA {
             (byte) 0x90, (byte) 0x90, (byte) 0xF0, (byte) 0x10, (byte) 0x10, // 4
             (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 5
             (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x90, (byte) 0xF0, // 6
-            (byte) 0xF0, (byte) 0x10, (byte) 0x20, (byte) 0x40, (byte) 0x50, // 7
+            (byte) 0xF0, (byte) 0x10, (byte) 0x20, (byte) 0x40, (byte) 0x40, // 7
             (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x90, (byte) 0xF0, // 8
             (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 9
             (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x90, (byte) 0x90, // A
@@ -37,8 +37,8 @@ public class Memory {
     public char[] stack = new char[16];
     public byte SP;
 
-    public byte delayTimer;
-    public byte soundTimer;
+    public char delayTimer;
+    public char soundTimer;
 
     public Memory () {
         System.arraycopy(FONTS_DATA.data, 0, RAM, 0, FONTS_DATA.data.length);
