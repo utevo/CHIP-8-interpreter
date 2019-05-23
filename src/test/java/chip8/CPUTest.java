@@ -1096,19 +1096,21 @@ public class CPUTest {
 
     @Test
     public void opcodeDXYN() {
-//        memory.I = 123;
-//        memory.RAM[memory.I] =      (byte) 0b10101010;
-//        memory.RAM[memory.I + 1] =  (byte) 0b00000000;
-//        memory.RAM[memory.I + 2] =  (byte) 0b01101011;
-//        memory.RAM[memory.I + 3] =  (byte) 0b10101010;
-//        memory.RAM[memory.I + 4] =  (byte) 0b10101010;
-//
-//        memory.PC = 0;
-//        memory.V[0] = 62;
-//        memory.V[1] = 12;
-//
-//        memory.RAM[0] = (byte) (0xD0 | 0x00);
-//        memory.RAM[1] = (byte) (0x10 | 0x05);
+        basicInitialization();
+
+        memory.I = 123;
+        memory.RAM[memory.I] =      (byte) 0b10101010;
+        memory.RAM[memory.I + 1] =  (byte) 0b00000000;
+        memory.RAM[memory.I + 2] =  (byte) 0b01101011;
+        memory.RAM[memory.I + 3] =  (byte) 0b10101010;
+        memory.RAM[memory.I + 4] =  (byte) 0b10101010;
+
+        memory.PC = 0;
+        memory.V[0] = 62;
+        memory.V[1] = 12;
+
+        memory.RAM[0] = (byte) (0xD0 | 0x00);
+        memory.RAM[1] = (byte) (0x10 | 0x05);
     }
 
     @Test
