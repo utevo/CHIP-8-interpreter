@@ -3,6 +3,7 @@ package chip8.app;
 import chip8.*;
 import chip8.app.debug.RegistersInfoApp;
 import chip8.app.keyboard.KeyboardApp;
+import chip8.app.screen.ScreenApp;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -22,24 +23,29 @@ public class CHIP8App extends Application {
     private Keyboard keyboard;
     private Memory memory;
     private Screen screen;
-
     private CHIP8 chip8;
 
     private RegistersInfoApp registersInfoApp;
     private KeyboardApp keyboardApp;
-
     private ScreenApp screenApp;
 
 
+    private VBox layout;
+    private Scene scene;
     private MenuBar menuBar;
+
+
+    private Timeline cpuTimeline;
+    private Timeline timersTimeline;
+
 
     private boolean emulatorRunning = false;
 
-    private Timeline cpuLoop;
-    private Timeline timersLoop;
-
     private static final int SCREEN_WIDTH = 800;
     private static final int SCREEN_HEIGHT = 400;
+
+    private static final int CPU_RATE = 420;
+    private static final int TIMERS_RATE = 60;
 
     private MenuBar createMenuBar(Stage stage) {
 
@@ -93,52 +99,12 @@ public class CHIP8App extends Application {
         return menuBar;
     }
 
-    private void createDebugButtons (Stage stage, VBox layout) {
-        /*                  ***                  */
-        Button button1 = new Button("Next tick");
-        button1.setOnAction(e -> {
-            cpu.tick();
-            screenApp.render();
-            registersInfoApp.refresh(); }
-        );
-        layout.getChildren().add(button1);
-        /*                  ***                  */
-
-        /*                  ***                  */
-        Button button2 = new Button("Next 50 ticks");
-        button2.setOnAction(e -> {
-            for (int i = 0; i < 50; ++i)
-                cpu.tick();
-            screenApp.render();
-            registersInfoApp.refresh(); }
-        );
-        layout.getChildren().add(button2);
-        /*                  ***                  */
-
-        /*                  ***                  */
-        Button button3 = new Button("30 ticks of clocks");
-        button3.setOnAction(e -> {
-                    for (int i = 0; i < 30; ++i)
-                        chip8.timersTick();
-                    registersInfoApp.refresh();
-                }
-        );
-        layout.getChildren().add(button3);
-        /*                  ***                  */
-    }
-
-
-
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        VBox layout = new VBox();
         primaryStage.setTitle("CHIP-8 emulator");
 
-        menuBar = createMenuBar(primaryStage);
-        layout.getChildren().add(menuBar);
-
-
+        /* basic initialization */
         memory = new Memory();
         keyboard = new Keyboard();
         screen = new Screen();
@@ -146,41 +112,54 @@ public class CHIP8App extends Application {
         chip8 = new CHIP8(cpu);
 
 
+        layout = new VBox();
+
+        /* create menuBar*/
+        menuBar = createMenuBar(primaryStage);
+        layout.getChildren().add(menuBar);
+
+        /* create keyboardApp*/
         keyboardApp = new KeyboardApp(keyboard);
+
+        /* create screeApp*/
         screenApp = new ScreenApp(screen, SCREEN_WIDTH, SCREEN_HEIGHT);
         layout.getChildren().add(screenApp);
         screenApp.render();
+
+
+        /* create screeApp*/
         registersInfoApp = new RegistersInfoApp(cpu);
         registersInfoApp.refresh();
 
+        scene = new Scene(layout);
 
-        Scene scene = new Scene(layout);
 
+        /* config keyboardAPP */
         scene.setOnKeyPressed(keyboardApp.getEventHandlerForKeyPressed());
         scene.setOnKeyReleased(keyboardApp.getEventHandlerForKeyReleased());
 
 
-        cpuLoop = new Timeline();
-        cpuLoop.setCycleCount(Timeline.INDEFINITE);
+        /* config cpuTimeline */
+        cpuTimeline = new Timeline();
+        cpuTimeline.setCycleCount(Timeline.INDEFINITE);
 
-        KeyFrame cpuFrame = new KeyFrame(Duration.seconds(0.003), e -> {
+        KeyFrame cpuFrame = new KeyFrame(Duration.seconds(1.0 / CPU_RATE), e -> {
 
             if (emulatorRunning == true) {
-                registersInfoApp.refresh();
                 chip8.cpuTick();
                 registersInfoApp.refresh();
                 screenApp.render();
             }
         });
-        cpuLoop.getKeyFrames().add(cpuFrame);
-        cpuLoop.play();
+        cpuTimeline.getKeyFrames().add(cpuFrame);
+        cpuTimeline.play();
 
 
+        /* config timersTimeline */
+        timersTimeline = new Timeline();
+        timersTimeline.setCycleCount(Timeline.INDEFINITE);
 
-        timersLoop = new Timeline();
-        timersLoop.setCycleCount(Timeline.INDEFINITE);
-
-        KeyFrame timersFrame = new KeyFrame(Duration.seconds(1.0/60), e -> {
+        KeyFrame timersFrame = new KeyFrame(Duration.seconds(1.0 / TIMERS_RATE), e -> {
 
             if (emulatorRunning == true) {
                 chip8.timersTick();
@@ -188,8 +167,8 @@ public class CHIP8App extends Application {
             }
         });
 
-        timersLoop.getKeyFrames().add(timersFrame);
-        timersLoop.play();
+        timersTimeline.getKeyFrames().add(timersFrame);
+        timersTimeline.play();
 
 
 
