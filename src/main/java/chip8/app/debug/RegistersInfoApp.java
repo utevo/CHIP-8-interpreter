@@ -71,10 +71,6 @@ public class RegistersInfoApp extends Stage {
         newRegister = new Register("I", valueOfRegisterAsHexString);
         registers.add(newRegister);
 
-        // SP
-        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.SP & 0xFF).toUpperCase();
-        newRegister = new Register("SP", valueOfRegisterAsHexString);
-        registers.add(newRegister);
 
         // V
         for (int i = 0; i <= 0xF; ++i) {
@@ -84,6 +80,11 @@ public class RegistersInfoApp extends Stage {
             newRegister = new Register("V" + iAsHexString, valueOfRegisterAsHexString);
             registers.add(newRegister);
         }
+
+        // SP
+        valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.SP & 0xFF).toUpperCase();
+        newRegister = new Register("SP", valueOfRegisterAsHexString);
+        registers.add(newRegister);
 
         // soundTimer
         valueOfRegisterAsHexString = "0x" + Integer.toHexString(memory.soundTimer & 0xFF).toUpperCase();
