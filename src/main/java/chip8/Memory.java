@@ -2,29 +2,6 @@ package chip8;
 
 import lombok.EqualsAndHashCode;
 
-/*
-    Group of sprites representing the hexadecimal digits 0 through F.
- */
-final class FONTS_DATA {
-    public static final byte[] data = {
-            (byte) 0xF0, (byte) 0x90, (byte) 0x90, (byte) 0x90, (byte) 0xF0, // 0
-            (byte) 0x20, (byte) 0x60, (byte) 0x20, (byte) 0x20, (byte) 0x70, // 1
-            (byte) 0xF0, (byte) 0x10, (byte) 0xF0, (byte) 0x80, (byte) 0xF0, // 2
-            (byte) 0xF0, (byte) 0x10, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 3
-            (byte) 0x90, (byte) 0x90, (byte) 0xF0, (byte) 0x10, (byte) 0x10, // 4
-            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 5
-            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x90, (byte) 0xF0, // 6
-            (byte) 0xF0, (byte) 0x10, (byte) 0x20, (byte) 0x40, (byte) 0x40, // 7
-            (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x90, (byte) 0xF0, // 8
-            (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x10, (byte) 0xF0, // 9
-            (byte) 0xF0, (byte) 0x90, (byte) 0xF0, (byte) 0x90, (byte) 0x90, // A
-            (byte) 0xE0, (byte) 0x90, (byte) 0xE0, (byte) 0x90, (byte) 0xE0, // B
-            (byte) 0xF0, (byte) 0x80, (byte) 0x80, (byte) 0x80, (byte) 0xF0, // C
-            (byte) 0xE0, (byte) 0x90, (byte) 0x90, (byte) 0x90, (byte) 0xE0, // D
-            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x80, (byte) 0xF0, // E
-            (byte) 0xF0, (byte) 0x80, (byte) 0xF0, (byte) 0x80, (byte) 0x80  // F
-    };
-}
 
 @EqualsAndHashCode
 public class Memory {
@@ -40,8 +17,8 @@ public class Memory {
     public char delayTimer;
     public char soundTimer;
 
-    public Memory () {
-        System.arraycopy(FONTS_DATA.data, 0, RAM, 0, FONTS_DATA.data.length);
+    public Memory() {
+        System.arraycopy(FontsData.data, 0, RAM, 0, FontsData.data.length);
     }
 
     public void clear() {
@@ -63,4 +40,6 @@ public class Memory {
         System.arraycopy(program, 0, RAM, 512, program.length);
         PC = 0x200;
     }
+
+
 }

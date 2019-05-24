@@ -1,5 +1,6 @@
 package chip8;
 
+import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +21,10 @@ public class CPU {
 
     public boolean wasChangeOnScreen() {
         return changeOnScreen;
+    }
+
+    public CPU() {
+        this(new Memory(), new Keyboard(), new  Screen());
     }
 
     public CPU(Memory memory, Keyboard keyboard, Screen screen) {
@@ -678,6 +683,31 @@ public class CPU {
 
         System.arraycopy(memory.RAM, I, memory.V,0, X + 1);
         memory.PC += 2;
+    }
+
+    public String toString() {
+        String jsonStr = new Gson().toJson(this);
+        return jsonStr;
+    }
+
+    public CPU(String json) {
+        Gson gson = new Gson();
+        CPU cpuFromJson = gson.fromJson(json, CPU.class);
+
+        memory = cpuFromJson.memory;
+        keyboard = cpuFromJson.keyboard;
+        screen = cpuFromJson.screen;
+        changeOnScreen = cpuFromJson.changeOnScreen;
+        RNG = cpuFromJson.RNG;
+    }
+
+    public static void main(String []args) {
+        CPU cpu = new CPU(new Memory(), new Keyboard(), new Screen());
+
+        System.out.println(cpu.toString());
+
+        CPU newCpu = new CPU(cpu.toString());
+        System.out.println(newCpu.toString());
     }
 
 }
