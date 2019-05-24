@@ -3,33 +3,22 @@ package chip8;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.io.FileUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 public class CHIP8 {
 
     @Getter @Setter
     private CPU cpu;
-    @Getter @Setter
-    private Memory memory;
-    @Getter @Setter
-    private Keyboard keyboard;
-    @Getter @Setter
-    private Screen screen;
+
 
     public CHIP8() {
-        memory = new Memory();
-        keyboard = new Keyboard();
-        screen = new Screen();
-
-        cpu = new CPU(memory, keyboard, screen);
+        cpu = new CPU(new Memory(), new Keyboard(), new Screen());
     }
 
     public CHIP8(CPU cpu) {
-        memory = cpu.getMemory();
-        keyboard = cpu.getKeyboard();
-        screen = cpu.getScreen();
-
         this.cpu = cpu;
     }
 
@@ -42,7 +31,7 @@ public class CHIP8 {
     }
 
     public void loadProgram(File file) {
-        screen.clear();
+        cpu.getScreen().clear();
 
         try {
             DataInputStream input = new DataInputStream(new BufferedInputStream(new FileInputStream(file)));
@@ -50,7 +39,7 @@ public class CHIP8 {
             byte[] programAsArrayOfByte = new byte[(int) file.length()];
             input.read(programAsArrayOfByte);
 
-            memory.loadProgram(programAsArrayOfByte);
+            cpu.getMemory().loadProgram(programAsArrayOfByte);
 
             input.close();
         } catch (FileNotFoundException e) {
@@ -58,5 +47,15 @@ public class CHIP8 {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void saveState(File file) throws IOException {
+        String json = cpu.toString();
+        FileUtils.writeStringToFile(file, json);
+    }
+
+    public void loadState(File file) throws IOException {
+        String json = FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+        cpu = new CPU(json);
     }
 }
