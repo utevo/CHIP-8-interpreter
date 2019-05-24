@@ -1,5 +1,6 @@
 package chip8.app.debug;
 
+import chip8.CHIP8;
 import chip8.CPU;
 import chip8.Memory;
 import javafx.collections.FXCollections;
@@ -13,14 +14,14 @@ import javafx.stage.Stage;
 
 public class RegistersInfoApp extends Stage {
 
-    private CPU cpu;
+    private CHIP8 chip8;
 
     private TableView<Register> table;
     private StackPane layout;
     private Scene scene;
 
-    public RegistersInfoApp(CPU cpu) {
-        this.cpu = cpu;
+    public RegistersInfoApp(CHIP8 chip8) {
+        this.chip8 = chip8;
 
         TableColumn<Register, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setMinWidth(200);
@@ -45,7 +46,7 @@ public class RegistersInfoApp extends Stage {
     }
 
     public void refresh(){
-        Memory memory = cpu.getMemory();
+        Memory memory = chip8.getCpu().getMemory();
 
         ObservableList<Register> registers = FXCollections.observableArrayList();
         String valueOfRegisterAsHexString;
