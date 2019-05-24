@@ -18,7 +18,7 @@ public class Memory {
     public char soundTimer;
 
     public Memory() {
-        System.arraycopy(FontData.data, 0, RAM, 0, FontData.data.length);
+        System.arraycopy(FontsData.data, 0, RAM, 0, FontsData.data.length);
     }
 
     public void clear() {
