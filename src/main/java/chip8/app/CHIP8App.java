@@ -126,7 +126,7 @@ public class CHIP8App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        primaryStage.setTitle("CHIP-8 emulator");
+        primaryStage.setTitle("CHIP-8 interpreter");
 
         /* basic initialization */
         chip8 = new CHIP8();
