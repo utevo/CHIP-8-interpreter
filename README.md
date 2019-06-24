@@ -59,4 +59,4 @@ $ mvn test
 - debug mode
 
 # License
-Licensed under MIT license. Copyright (c) 2019 Michał Kowieski
+Licensed under [MIT](LICENSE.md) license. Copyright (c) 2019 Michał Kowieski
