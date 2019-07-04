@@ -1,5 +1,5 @@
 # CHIP-8-interpreter
-A simple CHIP-8 interpreter written in Java.
+👾 A simple CHIP-8 interpreter written in Java.
 
 # What is it?
 Chip-8 is a simple, interpreted, programming language which was first used on some do-it-yourself computer systems in the late 1970s and early 1980s. The COSMAC VIP, DREAM 6800, and ETI 660 computers are a few examples.
